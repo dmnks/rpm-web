@@ -24,104 +24,128 @@ commit hash" to mark the difference.
 
 ## Selecting commits
 
-Crafting a maintenance update is inherently a manual process which starts by
+Crafting a maintenance release is inherently a manual process which starts by
 selecting suitable commits from the master branch to cherry-pick or backport
-into the respective maintenance branch.  While it's possible to do this work
-directly in git from the start, it's usually better to first create a
-plain-text file listing all the commits you're considering, share it with the
-team via email to get early feedback, and once that's polished enough, proceed
-with the actual cherry-picking and backporting in your git checkout.  This
-allows for easy per-commit discussion without having to go through a
-full-fledged PR review process and repeat any manual conflict resolution when a
-commit is added or removed in the process.
+into the respective stable branch.
 
-The format of the text file is up to you, we've had success with one that's
-inspired by the interactive git rebase:
+While you can obviously do this directly in git from the start, it's advisable
+to instead keep a plain-text file listing all the commits on the master branch
+since the branching point, mark the desired commits and use that as a plan
+first.  The advantage of this approach is that it allows you to:
 
-```
-pick <abbrev-hash> <subject>
-pick <abbrev-hash> <subject>
-drop <abbrev-hash> <subject>
-[...]
-```
+* Keep track of which commits you've already reviewed, also when preparing the
+  next release in the future
 
-The advantage of this format is that you can then automate the cherry-picking
-in git with a simple shell script.
+* Email the plan to the team to get early feedback
 
-### Getting started
+* Tweak the plan easily, without having to (re)do any conflict resolution
 
-In order to start the selection process, you need to know *where* to start
-looking, that is, which is the oldest commit on the master branch that wasn't
-released in the previous maintenance update and thus needs to be reviewed
-first.  As a rule of thumb, that should be the commit denoted in a
-`(cherry-picked from <hash>)` line in the latest commit on the maintenance
-branch, if that branch exists.  Of course, there could be additional commits on
-the maintenance branch which weren't taken from master, as well as some commits
-older than `<hash>` that might be worth considering in the release, so use your
-best judgement.
+* Use a shell script to automate the cherry-picking and try different
+  combinations of commits to see if they apply cleanly
+
+The following text describes a specific workflow involving such a text file.
 
 ### Creating a plan
 
-Once you have that commit identified, you can generate a text file in the above
-format with the following command (replace `<hash>` with the commit hash):
+To generate a new plan file for the given stable branch, use the following
+command (replace `<stable>` with the respective branch name, e.g.
+`rpm-4.17.x`):
 
 ```
-git log --reverse --format="     %h %s" <hash>..master > gitplan
+git cherry -v <stable> master | sed 's/^\-/\*/; s/^\+/ /' > ~/<stable>.diff
 ```
 
-As you go through the commits one by one (e.g. using `git show` in a separate
-terminal), you make a note next to the respective commit in the `gitplan` file
-by entering either `pick` or `drop` into the empty space at the beginning of
-the line.  Lines without a keyword indicate the commits that you haven't
-reviewed yet, which can serve as a "bookmark".
+This will create a chronological list of commits on the master branch since the
+common ancestor of both branches and mark those that have been cherry-picked
+already with an `*`.  The `.diff` extension will give you nice color
+highlighting out-of-the-box in any sensible text editor, which will come in
+handy [next](#editing-a-plan).
 
-### Reviewing commits
+To update an existing plan file with new commits on the master branch, run the
+same command but add the hash of the last commit from that file as the third
+positional argument, and append the output to the file.
 
-This is the actual 
+Note that backported commits (i.e. with a unique diff) will not be marked,
+you'll need to mark those manually.  This can be automated, of course, since
+all such commits are supposed to contain the "Backported from commit" line in
+their commit messages, but that's beyond the scope of this guide.  Normally,
+backported commits aren't as numerous so this shouldn't be a big deal.
 
-### Applying the plan
+### Editing a plan
 
-From time to time, you may want to test-drive your `gitplan` file to see if the
-selected commits apply cleanly and even do some preliminary backporting work if
-you wish.  To do that, you can run the following script:
+The next step is to go through each commit that's unmarked and mark it with
+either a `+` or `-` depending on whether you'd consider it for inclusion in a
+stable release or not, respectively.
 
-```
-```
-
-### Sharing the plan
-
-Once you're satisfied with your selection, send `gitplan` as a plain-text email
-to the RPM mailing list (TBD), asking for feedback.
-
-### Opening a PR
-
-Once there's a consensus about the plan, open a pull request
-
-
-
-
-### 
-
-
-For each fix or other change you consider cherry-picking, ask yourself:
+When reviewing a commit for eligibility, ask yourself:
 
 * Does it change the ABI or API in an incompatible way?
 
-    Generally adding entirely new APIs is okay, any other change is not, except of course to fix behavior bugs.
+    Generally adding entirely new APIs is okay, any other change is not, except
+    of course to fix behavior bugs.
 
 * Does it affect package building in an incompatible way?
 
-    For example, adding new types of requires within stable releases is not a good idea (but provides are mostly harmless). New spec sanity checks may seem obvious, but unless its a crasher, chances are somebody is actually (ab)using it and will be unhappy if the package no longer builds. New warnings are generally okay, hard errors often are not.
+    For example, adding new types of requires within stable releases is not a
+    good idea (but provides are mostly harmless). New spec sanity checks may
+    seem obvious, but unless its a crasher, chances are somebody is actually
+    (ab)using it and will be unhappy if the package no longer builds. New
+    warnings are generally okay, hard errors often are not.
 
-    As a rule of thumb: If a package was buildable with rpm-X.Y.Z then it should also be buildable without changes on rpm-X.Y.Z+1, even if it relies on buggy behavior.
+    As a rule of thumb: If a package was buildable with rpm-X.Y.Z then it
+    should also be buildable without changes on rpm-X.Y.Z+1, even if it relies
+    on buggy behavior.
 
 * Does it affect package installation in an incompatible way?
 
-    Rpm is commonly used to install much older and also newer packages built with other versions than the running version, installation compatibility is hugely important always and even more so within stable branches.
+    Rpm is commonly used to install much older and also newer packages built
+    with other versions than the running version, installation compatibility is
+    hugely important always and even more so within stable branches.
 
-    As a rule of thumb: If a package was installable with rpm-X.Y.Z then it should also be installable without changes on rpm-X.Y.Z+1, even if it relies on buggy behavior.
+    As a rule of thumb: If a package was installable with rpm-X.Y.Z then it
+    should also be installable without changes on rpm-X.Y.Z+1, even if it
+    relies on buggy behavior.
 
-If the answer to any of the above is "yes" then its almost certainly not appropriate for stable maintenance release.
+If the answer to any of the above is "yes" then it's almost certainly not
+appropriate for a stable maintenance release.
+
+It's advisable to keep the plan file around for as long as the given stable
+branch is in support, so that the information about which commits have been
+reviewed for eligibility isn't lost.  When requesting a review of new commits,
+whether during the preparation of the same release or the next one, you may
+want to somehow indicate which commits are subject to review and which were
+already reviewed in the past.  One way to do that is to simply turn all
+existing `+` and `-` signs into `*` with the following command:
+
+```
+sed -i 's/^[\+\-]/\*/' ~/<stable>.diff
+```
+
+### Applying a plan
+
+As you're working on the plan, you may want to try it out from time to time to
+see if everything applies cleanly or whether there would be any conflicts.  To
+do that, you can use the following shell script:
+
+```
+TBD
+```
+
+Of course, you can use the same script to perform the final cherry-picking on
+the stable branch before pushing it to a remote.
+
+### Sharing a plan
+
+Once you're satisfied with your nominations, send a plain-text email containing
+the plan to the TBD mailing list and ask for feedback.  That way, people can
+reply directly to the individual commits inline.  Based on the feedback, make
+sure to update your local copy of the plan accordingly.
+
+### Finalizing a plan
+
+Now that the plan is polished and considered final, [apply](#applying-a-plan)
+it to the stable branch and move on to the actual
+[release preparation](#cutting-a-release).
 
 ## Cutting a release
 
