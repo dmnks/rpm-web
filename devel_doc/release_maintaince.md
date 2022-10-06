@@ -22,7 +22,86 @@ see if it's resolvable with a suitable upstream commit and if not, when
 fixing manually change the "cherry-picked from" message into "Backported from
 commit hash" to mark the difference.
 
-## Selecting commits for cherry-picking (or backporting) for maintenance updates
+## Selecting commits
+
+Crafting a maintenance update is inherently a manual process which starts by
+selecting suitable commits from the master branch to cherry-pick or backport
+into the respective maintenance branch.  While it's possible to do this work
+directly in git from the start, it's usually better to first create a
+plain-text file listing all the commits you're considering, share it with the
+team via email to get early feedback, and once that's polished enough, proceed
+with the actual cherry-picking and backporting in your git checkout.  This
+allows for easy per-commit discussion without having to go through a
+full-fledged PR review process and repeat any manual conflict resolution when a
+commit is added or removed in the process.
+
+The format of the text file is up to you, we've had success with one that's
+inspired by the interactive git rebase:
+
+```
+pick <abbrev-hash> <subject>
+pick <abbrev-hash> <subject>
+drop <abbrev-hash> <subject>
+[...]
+```
+
+The advantage of this format is that you can then automate the cherry-picking
+in git with a simple shell script.
+
+### Getting started
+
+In order to start the selection process, you need to know *where* to start
+looking, that is, which is the oldest commit on the master branch that wasn't
+released in the previous maintenance update and thus needs to be reviewed
+first.  As a rule of thumb, that should be the commit denoted in a
+`(cherry-picked from <hash>)` line in the latest commit on the maintenance
+branch, if that branch exists.  Of course, there could be additional commits on
+the maintenance branch which weren't taken from master, as well as some commits
+older than `<hash>` that might be worth considering in the release, so use your
+best judgement.
+
+### Creating a plan
+
+Once you have that commit identified, you can generate a text file in the above
+format with the following command (replace `<hash>` with the commit hash):
+
+```
+git log --reverse --format="     %h %s" <hash>..master > gitplan
+```
+
+As you go through the commits one by one (e.g. using `git show` in a separate
+terminal), you make a note next to the respective commit in the `gitplan` file
+by entering either `pick` or `drop` into the empty space at the beginning of
+the line.  Lines without a keyword indicate the commits that you haven't
+reviewed yet, which can serve as a "bookmark".
+
+### Reviewing commits
+
+This is the actual 
+
+### Applying the plan
+
+From time to time, you may want to test-drive your `gitplan` file to see if the
+selected commits apply cleanly and even do some preliminary backporting work if
+you wish.  To do that, you can run the following script:
+
+```
+```
+
+### Sharing the plan
+
+Once you're satisfied with your selection, send `gitplan` as a plain-text email
+to the RPM mailing list (TBD), asking for feedback.
+
+### Opening a PR
+
+Once there's a consensus about the plan, open a pull request
+
+
+
+
+### 
+
 
 For each fix or other change you consider cherry-picking, ask yourself:
 
