@@ -133,9 +133,11 @@ the plan to the TBD mailing list and ask for feedback.  That way, people can
 reply directly to the individual commits inline.  Based on the feedback, make
 sure to update your local copy of the plan accordingly.
 
-You may need to do a few rounds of review as new commits appear on the master
-branch.  For each round, insert a new line `@@ <release> batch <batch> @@`
-(incrementing `<batch>` by one) to delineate the commits that need feedback.
+Occasionally, you may need to do another round of review as new commits appear
+on the master branch.  Before you [update](#creating-a-plan) the plan, append a
+line `@@ <release> batch 2 @@` to the file to delineate the commits that need
+feedback.  Of course, if you need even more rounds, repeat that and increment
+the batch number.
 
 If the file is already too long, feel free to just strip the no longer relevant
 `@@` "hunks" in the email to make it less noisy.  In a local copy, it's helpful
