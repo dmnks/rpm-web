@@ -49,9 +49,9 @@ workflow that suits you better.
 
 ### Creating a plan
 
-To create a plan file for a stable branch, use the following command, replacing
-`<stable>` with the stable branch name, e.g. `rpm-4.17.x` (leave `<base>` out
-for now):
+First, you need to create a plan file for the respective stable branch using
+the following command, replacing `<stable>` with the stable branch name, e.g.
+`rpm-4.17.x` (leave `<base>` out for now):
 
 ```
 $ git cherry -v <stable> master [<base>] | sed 's/^\-/\*/; s/^\+/ /' >> ~/<stable>.patch
