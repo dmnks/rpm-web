@@ -60,7 +60,8 @@ $ git cherry -v <stable> master [<base>] | sed 's/^\-/\*/; s/^\+/ /' >> ~/<stabl
 This will generate a chronological list of commits on the master branch since
 the common ancestor of both branches, and mark those that have been
 cherry-picked already with an `*`.  The `.patch` extension will give you nice
-color highlighting out-of-the-box in any sensible text editor.
+color highlighting out-of-the-box in any sensible text editor, which will come
+in handy [next](#editing-a-plan).
 
 To update the plan with new commits on the master branch, just re-run the above
 command with `<base>` replaced by the hash of the last commit in the file.
@@ -85,7 +86,7 @@ instead.
 
 In practice, it's a good idea to look a bit further back than the last marked
 (or first unmarked) commit, as there could be useful commits that were skipped
-in the previous release due to budget constraints.
+in the previous release due to budget constraints and such.
 
 Once you've chosen your starting point, mark it by inserting a line
 `@@ <release> round 1 @@` above it where `<release>` is the release you're
@@ -138,7 +139,7 @@ TBD
 ```
 
 Of course, you can use the same script to perform the final cherry-picking on
-the stable branch before pushing it to a remote.
+the stable branch before pushing it to a remote, too.
 
 ### Sharing a plan
 
@@ -153,7 +154,7 @@ branch.  For each round, insert a line `@@ <release> round <round> @@`
 
 If the file is already too long, feel free to just strip the no longer relevant
 part off (e.g. right before the last `@@` line) in the email to make it less
-noisy.
+noisy.  In a local copy, it's helpful to keep the full history, though.
 
 ### Finalizing a plan
 
