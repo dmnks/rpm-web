@@ -80,13 +80,11 @@ release or not, respectively.
 
 If this is not the first release on the stable branch, you may want to skip the
 commits that were already reviewed in the past.  As a rule of thumb, the last
-marked commit is a good indication of where the last release was cut.  If
-you're just updating an existing plan file, look at the first unmarked commit
-instead.
+marked commit is a good indication of where the last release was cut.
 
 In practice, it's a good idea to look a bit further back than the last marked
-(or first unmarked) commit, as there could be useful commits that were skipped
-in the previous release due to budget constraints and such.
+commit, as there could be useful commits that were skipped in the previous
+release due to budget constraints and such.
 
 Once you've chosen your starting point, mark it by inserting a line
 `@@ <release> batch 1 @@` above it where `<release>` is the release you're
