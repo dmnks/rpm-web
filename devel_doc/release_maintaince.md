@@ -87,8 +87,8 @@ commit, as there could be useful commits that were skipped in the previous
 release due to budget constraints and such.
 
 Once you've chosen your starting point, mark it by inserting a line
-`@@ <release> batch 1 @@` above it where `<release>` is the release you're
-working on (e.g. `rpm-4.17.1`).
+`@@ <release> @@` above it where `<release>` is the release you're working on
+(e.g. `rpm-4.17.1`).
 
 When reviewing a commit for inclusion, ask yourself:
 
@@ -136,13 +136,13 @@ sure to update your local copy of the plan accordingly.
 
 Occasionally, you may need to do another round of review as new commits appear
 on the master branch.  Before you [update](#creating-a-plan) the plan, append a
-line `@@ <release> batch 2 @@` to the file to delineate the commits that need
-feedback.  Of course, if you need even more rounds, repeat that and increment
-the batch number.
+line `@@ batch 2 @@` to the file to delineate the commits that need feedback.
+Of course, if you need even more rounds, repeat that and increment the batch
+number.
 
-If the file is already too long, feel free to just strip the no longer relevant
-`@@` "hunks" in the email to make it less noisy.  In a local copy, it's helpful
-to keep the full history, though.
+If the file gets too long, feel free to just strip the no longer relevant `@@`
+"hunks" in the email to make it less noisy.  In a local copy, though, it's
+helpful to keep the full history.
 
 ### Applying a plan
 
