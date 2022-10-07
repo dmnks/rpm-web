@@ -153,8 +153,8 @@ branch.  For each round, insert a line `@@ <release> batch <batch> @@`
 (incrementing `<batch>` by one) to delineate the commits that need feedback.
 
 If the file is already too long, feel free to just strip the no longer relevant
-part off (e.g. right before the last `@@` line) in the email to make it less
-noisy.  In a local copy, it's helpful to keep the full history, though.
+`@@` "hunks" in the email to make it less noisy.  In a local copy, it's helpful
+to keep the full history, though.
 
 ### Finalizing a plan
 
