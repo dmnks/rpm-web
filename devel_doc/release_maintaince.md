@@ -89,7 +89,7 @@ In practice, it's a good idea to look a bit further back than the last marked
 in the previous release due to budget constraints and such.
 
 Once you've chosen your starting point, mark it by inserting a line
-`@@ <release> round 1 @@` above it where `<release>` is the release you're
+`@@ <release> batch 1 @@` above it where `<release>` is the release you're
 working on (e.g. `rpm-4.17.1`).
 
 When reviewing a commit for inclusion, ask yourself:
@@ -149,8 +149,8 @@ reply directly to the individual commits inline.  Based on the feedback, make
 sure to update your local copy of the plan accordingly.
 
 You may need to do a few rounds of review as new commits appear on the master
-branch.  For each round, insert a line `@@ <release> round <round> @@`
-(incrementing `<round>` by one) to delineate the commits that need feedback.
+branch.  For each round, insert a line `@@ <release> batch <batch> @@`
+(incrementing `<batch>` by one) to delineate the commits that need feedback.
 
 If the file is already too long, feel free to just strip the no longer relevant
 part off (e.g. right before the last `@@` line) in the email to make it less
