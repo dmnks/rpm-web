@@ -122,6 +122,7 @@ When reviewing a commit for inclusion, ask yourself:
 If the answer to any of the above is "yes" then it's almost certainly not
 appropriate for a stable maintenance release.
 
+TODO (REVIEWED VS BUDGET?)
 It's advisable to keep the plan file around for as long as the given stable
 branch is in support so that the information about which commits have been
 reviewed isn't lost.
