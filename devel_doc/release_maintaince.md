@@ -151,6 +151,13 @@ Once the plan is ready, you can apply it using the following script:
 TBD
 ```
 
+At this point, you can turn all `+` lines into `*` in the file to make it
+reflect the stable branch:
+
+```
+$ sed -i 's/^\+/\*/' <stable>.patch
+```
+
 This script is also useful when just crafting the plan as you can try it out to
 see if it applies cleanly and then reset the branch to the original tip, such
 as:
