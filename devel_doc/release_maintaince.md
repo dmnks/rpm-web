@@ -43,27 +43,27 @@ first.  The advantage of this approach is that it allows you to:
 * Use a shell script to automate the cherry-picking and try different
   combinations of commits to see if they apply cleanly
 
-The following text describes a specific workflow involving such a text file.
+The following text describes one specific workflow involving such a text file.
+You're of course free to tweak it as you deem necessary or use a different
+workflow that suits you better.
 
 ### Creating a plan
 
-To generate a new plan file for the given stable branch, use the following
-command (replace `<stable>` with the respective branch name, e.g.
-`rpm-4.17.x`):
+To create a plan file for a stable branch, use the following command, replacing
+`<stable>` with the stable branch name, e.g. `rpm-4.17.x` (leave `<base>` out
+for now):
 
 ```
-git cherry -v <stable> master | sed 's/^\-/\*/; s/^\+/ /' > ~/<stable>.diff
+$ git cherry -v <stable> master [<base>] | sed 's/^\-/\*/; s/^\+/ /' >> ~/<stable>.patch
 ```
 
-This will create a chronological list of commits on the master branch since the
-common ancestor of both branches and mark those that have been cherry-picked
-already with an `*`.  The `.diff` extension will give you nice color
-highlighting out-of-the-box in any sensible text editor, which will come in
-handy [next](#editing-a-plan).
+This will generate a chronological list of commits on the master branch since
+the common ancestor of both branches, and mark those that have been
+cherry-picked already with an `*`.  The `.patch` extension will give you nice
+color highlighting out-of-the-box in any sensible text editor.
 
-To update an existing plan file with new commits on the master branch, run the
-same command but add the hash of the last commit from that file as the third
-positional argument, and append the output to the file.
+To update the plan with new commits on the master branch, just re-run the above
+command with `<base>` replaced by the hash of the last commit in the file.
 
 Note that backported commits (i.e. with a unique diff) will not be marked,
 you'll need to mark those manually.  This can be automated, of course, since
@@ -74,10 +74,24 @@ backported commits aren't as numerous so this shouldn't be a big deal.
 ### Editing a plan
 
 The next step is to go through each commit that's unmarked and mark it with
-either a `+` or `-` depending on whether you'd consider it for inclusion in a
-stable release or not, respectively.
+either a `+` or `-` depending on whether you propose it for inclusion in the
+release or not, respectively.
 
-When reviewing a commit for eligibility, ask yourself:
+If this is not the first release on the stable branch, you may want to skip the
+commits that were already reviewed in the past.  As a rule of thumb, the last
+marked commit is a good indication of where the last release was cut.  If
+you're just updating an existing plan file, look at the first unmarked commit
+instead.
+
+In practice, it's a good idea to look a bit further back than the last marked
+(or first unmarked) commit, as there could be useful commits that were skipped
+in the previous release due to budget constraints.
+
+Once you've chosen your starting point, mark it by inserting a line
+`@@ <release> round 1 @@` above it where `<release>` is the release you're
+working on (e.g. `rpm-4.17.1`).
+
+When reviewing a commit for inclusion, ask yourself:
 
 * Does it change the ABI or API in an incompatible way?
 
@@ -110,16 +124,8 @@ If the answer to any of the above is "yes" then it's almost certainly not
 appropriate for a stable maintenance release.
 
 It's advisable to keep the plan file around for as long as the given stable
-branch is in support, so that the information about which commits have been
-reviewed for eligibility isn't lost.  When requesting a review of new commits,
-whether during the preparation of the same release or the next one, you may
-want to somehow indicate which commits are subject to review and which were
-already reviewed in the past.  One way to do that is to simply turn all
-existing `+` and `-` signs into `*` with the following command:
-
-```
-sed -i 's/^[\+\-]/\*/' ~/<stable>.diff
-```
+branch is in support so that the information about which commits have been
+reviewed isn't lost.
 
 ### Applying a plan
 
@@ -140,6 +146,14 @@ Once you're satisfied with your nominations, send a plain-text email containing
 the plan to the TBD mailing list and ask for feedback.  That way, people can
 reply directly to the individual commits inline.  Based on the feedback, make
 sure to update your local copy of the plan accordingly.
+
+You may need to do a few rounds of review as new commits appear on the master
+branch.  For each round, insert a line `@@ <release> round <round> @@`
+(incrementing `<round>` by one) to delineate the commits that need feedback.
+
+If the file is already too long, feel free to just strip the no longer relevant
+part off (e.g. right before the last `@@` line) in the email to make it less
+noisy.
 
 ### Finalizing a plan
 
