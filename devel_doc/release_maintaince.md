@@ -128,19 +128,6 @@ It's advisable to keep the plan file around for as long as the given stable
 branch is in support so that the information about which commits have been
 reviewed isn't lost.
 
-### Applying a plan
-
-As you're working on the plan, you may want to try it out from time to time to
-see if everything applies cleanly or whether there would be any conflicts.  To
-do that, you can use the following shell script:
-
-```
-TBD
-```
-
-Of course, you can use the same script to perform the final cherry-picking on
-the stable branch before pushing it to a remote, too.
-
 ### Sharing a plan
 
 Once you're satisfied with your nominations, send a plain-text email containing
@@ -149,18 +136,28 @@ reply directly to the individual commits inline.  Based on the feedback, make
 sure to update your local copy of the plan accordingly.
 
 You may need to do a few rounds of review as new commits appear on the master
-branch.  For each round, insert a line `@@ <release> batch <batch> @@`
+branch.  For each round, insert a new line `@@ <release> batch <batch> @@`
 (incrementing `<batch>` by one) to delineate the commits that need feedback.
 
 If the file is already too long, feel free to just strip the no longer relevant
 `@@` "hunks" in the email to make it less noisy.  In a local copy, it's helpful
 to keep the full history, though.
 
-### Finalizing a plan
+### Applying a plan
 
-Now that the plan is polished and considered final, [apply](#applying-a-plan)
-it to the stable branch and move on to the actual
-[release preparation](#cutting-a-release).
+Once the plan is ready, you can apply it using the following script:
+
+```
+TBD
+```
+
+This script is also useful when just crafting the plan as you can try it out to
+see if it applies cleanly and then reset the branch to the original tip, such
+as:
+
+```
+$ git reset --hard origin/<stable>
+```
 
 ## Cutting a release
 
