@@ -127,16 +127,16 @@ A useful tool to help you pick and, in particular, *not* pick stuff, is a
 Of course, this number is just a ballpark figure and you may want to tweak it
 as necessary.
 
-Generally speaking, the budget is for code changes only, so any test and
+Generally speaking, the budget is for code changes *only*, so any test and
 documentation additions and updates do *not* count and should always be picked
 if possible.
 
 ### Sharing a plan
 
-Once you're satisfied with your picks, send a plain-text email containing the
-plan to the TBD mailing list and ask for feedback.  That way, people can reply
-directly to the individual commits inline.  Based on the feedback, make sure to
-update your local copy of the plan accordingly.
+Once you're satisfied with your picks, send the plan as a plain-text email to
+the TBD mailing list and ask for feedback.  That way, people can reply directly
+to the individual commits inline.  Based on the feedback, make sure to update
+your local copy of the plan accordingly.
 
 You may need to do another round of review as new commits appear on the master
 branch, in which case delineate the new commits with a `@@ batch 2 @@` line.
