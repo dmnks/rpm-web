@@ -74,8 +74,9 @@ backported commits aren't as numerous so this shouldn't be a big deal.
 
 ### Editing a plan
 
-The next step is to go through each unmarked commit and mark it with a `+` if
-you wish to pick for the release.  For each commit you review, ask yourself:
+The next step is to go through the unmarked commits and mark those that you
+wish to pick for the release with a `+`.  For each commit you review, ask
+yourself:
 
 * Does it change the ABI or API in an incompatible way?
 
@@ -107,7 +108,7 @@ you wish to pick for the release.  For each commit you review, ask yourself:
 If the answer to any of the above is "yes" then it's almost certainly not
 appropriate for a stable maintenance release.  Mark such a commit with a `-`.
 
-Before you begin, though, make sure to mark the starting point by inserting a
+Before you begin, though, make sure to mark your starting point by inserting a
 `@@ <release> @@` line above the respective commit, replacing `<release>` with
 the release you're working on, e.g. `rpm-4.17.2`.  This will make it easier to
 [ask for feedback](#sharing-a-plan) later.
@@ -121,10 +122,10 @@ such.
 
 #### Budget
 
-As a tool to help you pick and, in particular, *not* pick stuff, is a *commit
-budget*.  Normally, 50 is a good one for a typical maintenance release.  Of
-course, this number is just a ballpark figure and you may want to tweak it as
-necessary.
+A useful tool to help you pick and, in particular, *not* pick stuff, is a
+*commit budget*.  Normally, 50 is a good one for a typical maintenance release.
+Of course, this number is just a ballpark figure and you may want to tweak it
+as necessary.
 
 Generally speaking, the budget is for code changes only, so any test and
 documentation additions and updates do *not* count and should always be picked
@@ -137,12 +138,12 @@ plan to the TBD mailing list and ask for feedback.  That way, people can reply
 directly to the individual commits inline.  Based on the feedback, make sure to
 update your local copy of the plan accordingly.
 
-You may need to do more rounds of review as new commits appear on the master
-branch, in which case delineate the new commits with a `@@ batch <N> @@` line,
-where `<N>` is the round number.
+You may need to do another round of review as new commits appear on the master
+branch, in which case delineate the new commits with a `@@ batch 2 @@` line.
+For any subsequent rounds, do the same and bump the number accordingly.
 
 If the file gets too long, feel free to just strip the no longer relevant `@@`
-"hunks" in the email to make it less noisy.  In a local copy, though, it's
+"hunks" from the email to make it less noisy.  In a local copy, though, it's
 helpful to keep the full history.
 
 ### Applying a plan
