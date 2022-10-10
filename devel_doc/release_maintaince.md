@@ -113,11 +113,11 @@ commit to review, replacing `<release>` with the release you're working on,
 e.g. `rpm-4.17.2`.  This will make it easier to
 [ask for feedback](#sharing-a-plan) later.
 
-If you've just created the plan file from scratch, it lacks any `-` markers and
-thus an obvious starting point.  In that case, the last `*` marker is a good
-candidate, but you may want to look a bit further back, too, in case some
-otherwise eligible commits were skipped due to [budget](#budget) constraints
-and such.
+If you've just created the plan file from scratch, an unmarked commit doesn't
+mean it wasn't reviewed as part of a previous release.  In that case, the last
+*marked* commit is a good starting point, but you may want to look a bit
+further back, in case some otherwise eligible commits were skipped due to
+[budget](#budget) constraints and such.
 
 #### Budget
 
