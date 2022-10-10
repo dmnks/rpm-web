@@ -113,11 +113,11 @@ Before you begin, though, make sure to mark the starting point by inserting a
 the release you're working on, e.g. `rpm-4.17.2`.  This will make it easier to
 [ask for feedback](#sharing-a-plan) later.
 
-If you've just created the plan file from scratch, you obviously lack any `-`
-markers from previous releases and thus a reasonable starting point.  In that
-case, the last marked commit is a good candidate, but you may want to look a
-bit further back, too, in case some commits were skipped due to budget
-constraints and such.
+If you've just created the plan file from scratch, you obviously lack the
+information on which commits were already reviewed as part of the previous
+release, and thus a reasonable starting point.  In that case, the last marked
+commit is a good candidate, but you may want to look a bit further back, too,
+in case some commits were skipped due to budget constraints and such.
 
 ### Sharing a plan
 
