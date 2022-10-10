@@ -76,23 +76,8 @@ backported commits aren't as numerous so this shouldn't be a big deal.
 
 ### Editing a plan
 
-The next step is to go through each commit that's unmarked and mark it with
-either a `+` or `-` depending on whether you propose it for inclusion in the
-release or not, respectively.
-
-If this is not the first release on the stable branch, you may want to skip the
-commits that were already reviewed in the past.  As a rule of thumb, the last
-marked commit is a good indication of where the last release was cut.
-
-In practice, it's a good idea to look a bit further back than the last marked
-commit, as there could be useful commits that were skipped in the previous
-release due to budget constraints and such.
-
-Once you've chosen your starting point, mark it by inserting a line
-`@@ <release> @@` above it, where `<release>` is the release you're working on,
-for example `rpm-4.17.2`.
-
-When reviewing a commit for inclusion, ask yourself:
+The next step is to go through each unmarked commit and mark it with a `+` if
+you propose it for inclusion in the release.  For each commit, ask yourself:
 
 * Does it change the ABI or API in an incompatible way?
 
@@ -122,7 +107,18 @@ When reviewing a commit for inclusion, ask yourself:
     relies on buggy behavior.
 
 If the answer to any of the above is "yes" then it's almost certainly not
-appropriate for a stable maintenance release.
+appropriate for a stable maintenance release.  Mark such a commit with a `-`.
+
+Before you begin, though, make sure to mark the starting point by inserting a
+`@@ <release> @@` line above the respective commit, replacing `<release>` with
+the release you're working on, e.g. `rpm-4.17.2`.  This will make it easier to
+[ask for feedback](#sharing-a-plan) later.
+
+If you've just created the plan file from scratch, you obviously lack any `-`
+markers from previous releases and thus a reasonable starting point.  In that
+case, the last marked commit is a good candidate, but you may want to look a
+bit further back, too, in case some commits were skipped due to budget
+constraints and such.
 
 ### Sharing a plan
 
@@ -131,11 +127,9 @@ the plan to the TBD mailing list and ask for feedback.  That way, people can
 reply directly to the individual commits inline.  Based on the feedback, make
 sure to update your local copy of the plan accordingly.
 
-Occasionally, you may need to do another round of review as new commits appear
-on the master branch.  Before you [update](#creating-a-plan) the plan, append a
-line `@@ batch 2 @@` to the file to delineate the commits that need feedback.
-Of course, if you need even more rounds, repeat that and increment the batch
-number.
+You may need to do more rounds of review as new commits appear on the master
+branch, in which case delineate the new commits with a `@@ batch <N> @@` line,
+where `<N>` is the round number.
 
 If the file gets too long, feel free to just strip the no longer relevant `@@`
 "hunks" in the email to make it less noisy.  In a local copy, though, it's
