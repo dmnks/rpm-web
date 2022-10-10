@@ -43,27 +43,30 @@ first.  The advantage of this approach is that it allows you to:
 * Use a shell script to automate the cherry-picking and try different
   combinations of commits to see if they apply cleanly
 
-The following text describes one specific workflow involving such a text file,
-assuming `$STABLE` and `$RELEASE` expand to the respective stable branch and
-prepared release, respectively, for example `rpm-4.17.x` and `rpm-4.17.2`.
+The following text describes one specific workflow involving such a text file.
 
 ### Creating a plan
 
-First, create a plan file for the stable branch using the following command:
+To generate a plan for a `<stable>` branch, use the following command and
+redirect it to a file:
 
 ```
-$ git cherry -v $STABLE master | sed 's/^\-/\*/; s/^\+/ /' > $STABLE.patch
+$ git cherry -v <stable> master | sed 's/^\-/\*/; s/^\+/ /'
 ```
 
-This will generate a list of commits on the master branch since the common
+This will print a list of commits on the master branch since the common
 ancestor of both branches in chronological order, marking those that have been
-cherry-picked already with an `*`.  The `.patch` extension will give you color
-highlighting out-of-the-box in any sensible text editor, which will come in
-handy [next](#editing-a-plan).
+cherry-picked already with an `*`.
 
-To update the plan with new commits on the master branch, add the hash of the
-last commit in the file as the third positional argument to the `git cherry`
-command and use `>>` instead of `>`.
+To update the plan with new commits on the master branch, use the same command
+but add the hash of the last commit in the file as the third positional
+argument to the `git cherry` command.
+
+It's recommended that you keep *one* plan file per stable branch and just
+update it whenever making a new release, that way you can easily keep track of
+the already reviewed commits.  Also consider using the `.patch` extension as
+that will give you color highlighting out-of-the-box in any sensible text
+editor, which will come in handy [next](#editing-a-plan).
 
 Note that backported commits (i.e. with a unique diff) will not be marked,
 you'll need to mark those manually.  This can be automated, of course, since
@@ -86,7 +89,8 @@ commit, as there could be useful commits that were skipped in the previous
 release due to budget constraints and such.
 
 Once you've chosen your starting point, mark it by inserting a line
-`@@ $RELEASE @@` above it.
+`@@ <release> @@` above it, where `<release>` is the release you're working on,
+for example `rpm-4.17.2`.
 
 When reviewing a commit for inclusion, ask yourself:
 
@@ -119,11 +123,6 @@ When reviewing a commit for inclusion, ask yourself:
 
 If the answer to any of the above is "yes" then it's almost certainly not
 appropriate for a stable maintenance release.
-
-TODO (REVIEWED VS BUDGET?)
-It's advisable to keep the plan file around for as long as the given stable
-branch is in support so that the information about which commits have been
-reviewed isn't lost.
 
 ### Sharing a plan
 
