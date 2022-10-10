@@ -45,7 +45,7 @@ The following text describes one specific workflow involving such a text file.
 
 ### Creating a plan
 
-To generate a plan for a `<stable>` branch, use the following command and
+To generate a plan file for a `<stable>` branch, use the following command and
 redirect it to a file:
 
 ```
@@ -115,9 +115,9 @@ e.g. `rpm-4.17.2`.  This will make it easier to
 
 If you've just created the plan file from scratch, an unmarked commit doesn't
 mean it wasn't reviewed as part of a previous release.  In that case, the last
-*marked* commit is a good starting point, but you may want to look a bit
-further back, in case some otherwise eligible commits were skipped due to
-[budget](#budget) constraints and such.
+*marked* commit would be a better starting point, but you may still want to
+look a bit further back, in case some otherwise eligible commits were skipped
+due to [budget](#budget) constraints and such.
 
 #### Budget
 
