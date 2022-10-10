@@ -33,15 +33,13 @@ to instead keep a plain-text file listing all the commits on the master branch
 since the branching point, mark the desired commits and use that as a plan
 first.  The advantage of this approach is that it allows you to:
 
-* Keep track of which commits you've already reviewed, also when preparing the
-  next release in the future
+* Keep track of which commits you've already reviewed
 
 * Email the plan to the team to get early feedback
 
 * Tweak the plan easily, without having to (re)do any conflict resolution
 
-* Use a shell script to automate the cherry-picking and try different
-  combinations of commits to see if they apply cleanly
+* Use a shell script to automate the cherry-picking and test-drive the plan
 
 The following text describes one specific workflow involving such a text file.
 
