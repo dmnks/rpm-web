@@ -75,7 +75,7 @@ backported commits aren't as numerous so this shouldn't be a big deal.
 ### Editing a plan
 
 The next step is to go through the unmarked commits and mark those that you
-wish to pick for the release with a `+`.  For each commit you review, ask
+intend to pick for the release with a `+`.  For each commit you review, ask
 yourself:
 
 * Does it change the ABI or API in an incompatible way?
@@ -113,12 +113,10 @@ Before you begin, though, make sure to mark your starting point by inserting a
 the release you're working on, e.g. `rpm-4.17.2`.  This will make it easier to
 [ask for feedback](#sharing-a-plan) later.
 
-If you've just created the plan file from scratch, you obviously lack the
-information on which commits were already reviewed as part of the previous
-release, and thus a reasonable starting point.  In that case, the last marked
-commit is a good candidate, but you may want to look a bit further back, too,
-in case some commits were skipped due to [budget](#budget) constraints and
-such.
+If you've just created the plan file from scratch, you lack any `-` commits and
+thus an obvious starting point.  In that case, the last `*` commit is a good
+candidate, but you may want to look a bit further back, too, in case some
+commits were skipped due to [budget](#budget) constraints and such.
 
 #### Budget
 
