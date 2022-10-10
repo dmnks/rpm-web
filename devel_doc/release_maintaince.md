@@ -75,7 +75,8 @@ backported commits aren't as numerous so this shouldn't be a big deal.
 ### Editing a plan
 
 The next step is to go through each unmarked commit and mark it with a `+` if
-you propose it for inclusion in the release.  For each commit, ask yourself:
+you propose it for inclusion in the release.  For each commit you review, ask
+yourself:
 
 * Does it change the ABI or API in an incompatible way?
 
