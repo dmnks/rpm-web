@@ -113,9 +113,9 @@ commit to review, replacing `<release>` with the release you're working on,
 e.g. `rpm-4.17.2`.  This will make it easier to
 [ask for feedback](#sharing-a-plan) later.
 
-If you've just created the plan file from scratch, you lack the information
-about which commits were already reviewed as part of the previous release, and
-thus an obvious starting point.  In that case, the last marked commit is a good
+If you've just created the plan file from scratch, you lack the information on
+which commits were already reviewed as part of the previous release, and thus
+an obvious starting point.  In that case, the last marked commit is a good
 candidate, but you may want to look a bit further back, too, in case some
 commits were skipped due to [budget](#budget) constraints and such.
 
