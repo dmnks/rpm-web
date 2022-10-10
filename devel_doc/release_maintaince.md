@@ -75,8 +75,7 @@ backported commits aren't as numerous so this shouldn't be a big deal.
 ### Editing a plan
 
 The next step is to go through each unmarked commit and mark it with a `+` if
-you propose it for inclusion in the release.  For each commit you review, ask
-yourself:
+you wish to pick for the release.  For each commit you review, ask yourself:
 
 * Does it change the ABI or API in an incompatible way?
 
@@ -117,14 +116,26 @@ If you've just created the plan file from scratch, you obviously lack the
 information on which commits were already reviewed as part of the previous
 release, and thus a reasonable starting point.  In that case, the last marked
 commit is a good candidate, but you may want to look a bit further back, too,
-in case some commits were skipped due to budget constraints and such.
+in case some commits were skipped due to [budget](#budget) constraints and
+such.
+
+#### Budget
+
+As a tool to help you pick and, in particular, *not* pick stuff, is a *commit
+budget*.  Normally, 50 is a good one for a typical maintenance release.  Of
+course, this number is just a ballpark figure and you may want to tweak it as
+necessary.
+
+Generally speaking, the budget is for code changes only, so any test and
+documentation additions and updates do *not* count and should always be picked
+if possible.
 
 ### Sharing a plan
 
-Once you're satisfied with your nominations, send a plain-text email containing
-the plan to the TBD mailing list and ask for feedback.  That way, people can
-reply directly to the individual commits inline.  Based on the feedback, make
-sure to update your local copy of the plan accordingly.
+Once you're satisfied with your picks, send a plain-text email containing the
+plan to the TBD mailing list and ask for feedback.  That way, people can reply
+directly to the individual commits inline.  Based on the feedback, make sure to
+update your local copy of the plan accordingly.
 
 You may need to do more rounds of review as new commits appear on the master
 branch, in which case delineate the new commits with a `@@ batch <N> @@` line,
