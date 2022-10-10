@@ -43,28 +43,27 @@ first.  The advantage of this approach is that it allows you to:
 * Use a shell script to automate the cherry-picking and try different
   combinations of commits to see if they apply cleanly
 
-The following text describes one specific workflow involving such a text file.
-You're of course free to tweak it as you deem necessary or use a different
-workflow that suits you better.
+The following text describes one specific workflow involving such a text file,
+assuming `$STABLE` and `$RELEASE` expand to the respective stable branch and
+prepared release, respectively, for example `rpm-4.17.x` and `rpm-4.17.2`.
 
 ### Creating a plan
 
-First, you need to create a plan file for the respective stable branch using
-the following command, replacing `<stable>` with the stable branch name, e.g.
-`rpm-4.17.x` (leave `<base>` out for now):
+First, create a plan file for the stable branch using the following command:
 
 ```
-$ git cherry -v <stable> master [<base>] | sed 's/^\-/\*/; s/^\+/ /' >> ~/<stable>.patch
+$ git cherry -v $STABLE master | sed 's/^\-/\*/; s/^\+/ /' > $STABLE.patch
 ```
 
-This will generate a chronological list of commits on the master branch since
-the common ancestor of both branches, and mark those that have been
-cherry-picked already with an `*`.  The `.patch` extension will give you nice
-color highlighting out-of-the-box in any sensible text editor, which will come
-in handy [next](#editing-a-plan).
+This will generate a list of commits on the master branch since the common
+ancestor of both branches in chronological order, marking those that have been
+cherry-picked already with an `*`.  The `.patch` extension will give you color
+highlighting out-of-the-box in any sensible text editor, which will come in
+handy [next](#editing-a-plan).
 
-To update the plan with new commits on the master branch, just re-run the above
-command with `<base>` replaced by the hash of the last commit in the file.
+To update the plan with new commits on the master branch, add the hash of the
+last commit in the file as the third positional argument to the `git cherry`
+command and use `>>` instead of `>`.
 
 Note that backported commits (i.e. with a unique diff) will not be marked,
 you'll need to mark those manually.  This can be automated, of course, since
@@ -87,8 +86,7 @@ commit, as there could be useful commits that were skipped in the previous
 release due to budget constraints and such.
 
 Once you've chosen your starting point, mark it by inserting a line
-`@@ <release> @@` above it where `<release>` is the release you're working on
-(e.g. `rpm-4.17.1`).
+`@@ $RELEASE @@` above it.
 
 When reviewing a commit for inclusion, ask yourself:
 
