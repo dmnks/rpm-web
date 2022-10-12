@@ -28,10 +28,9 @@ Crafting a maintenance release is inherently a manual process which starts by
 selecting suitable commits from the master branch to cherry-pick or backport
 into the respective stable branch.
 
-While you can obviously do this directly in git from the start, it's advisable
-to instead keep a plain-text file listing all the commits on the master branch
-since the branching point, mark the desired commits and use that as a plan
-first.  The advantage of this approach is that it allows you to:
+While you can obviously do this directly in git from the start, it is
+recommended that you first create a plan in the form of a text file with a list
+of commits that you intend to pick.  This approach allows you to:
 
 * Keep track of which commits you've already reviewed
 
@@ -39,38 +38,52 @@ first.  The advantage of this approach is that it allows you to:
 
 * Tweak the plan easily, without having to (re)do any conflict resolution
 
-* Use a shell script to automate the cherry-picking and test-drive the plan
+* Ensure commits are always picked in chronological order
 
-The following text describes one specific workflow involving such a text file.
+* Use a shell script to automate the cherry-picking and try out different
+  variants of the plan to see which apply cleanly
+
+The following text describes one specific workflow involving such a text file
+and a simple helper script.
+
+### Installing the script
+
+Download the script from here, make it executable and from your RPM checkout,
+add a git alias for it:
+
+```
+$ git config alias.cherry-plan '!/path/to/script'
+```
 
 ### Creating a plan
 
-To generate a plan file for a `<stable>` branch, use the following command and
-redirect it to a file:
+To generate a plan file for a `<stable>` branch (e.g. `rpm-4.17.x`), run:
 
 ```
-$ git cherry -v <stable> master | sed 's/^\-/\*/; s/^\+/ /'
+$ git checkout <stable>
+$ git cherry-plan init
 ```
 
-This will print a list of commits on the master branch since the common
+This will create a file with a commit log on the master branch since the common
 ancestor of both branches in chronological order, marking those that have been
-cherry-picked already with an `*`.
+cherry-picked or backported already with an `*`.  To edit the file in your
+`$EDITOR`, run:
 
-To update the plan with new commits on the master branch, use the same command
-but add the hash of the last commit in the file as the third positional
-argument to the `git cherry` command.
+```
+$ git cherry-plan edit
+```
 
-It's recommended that you keep *one* plan file per stable branch and just
-update it whenever making a new release, that way you can easily keep track of
-the already reviewed commits.  Also consider using the `.patch` extension as
-that will give you color highlighting out-of-the-box in any sensible text
-editor, which will come in handy [next](#editing-a-plan).
+The file uses a patch-like format and is stored as
+`$HOME/.cherry-plan/<stable>.patch`.  The extension ensures you'll get nice
+color highlighting out-of-the-box in any sensible text editor.
 
-Note that backported commits (i.e. with a unique diff) will not be marked,
-you'll need to mark those manually.  This can be automated, of course, since
-all such commits are supposed to contain the "Backported from commit" line in
-their commit messages, but that's beyond the scope of this guide.  Normally,
-backported commits aren't as numerous so this shouldn't be a big deal.
+To append any new commits on the master branch to the plan, use:
+
+```
+$ git cherry-plan pull
+```
+
+This will print the appended commits, too.
 
 ### Editing a plan
 
@@ -108,18 +121,41 @@ yourself:
 If the answer to any of the above is "yes" then it's almost certainly not
 appropriate for a stable maintenance release.  Mark such a commit with a `-`.
 
-Before you begin, though, insert a `@@ <release> @@` line above the first
-commit to review, replacing `<release>` with the release you're working on,
-e.g. `rpm-4.17.2`.  This will make it easier to
-[ask for feedback](#sharing-a-plan) later.
+#### Choosing a starting point
 
-If you've just created the plan file from scratch, an unmarked commit doesn't
-mean it wasn't reviewed as part of a previous release.  In that case, the last
-*marked* commit would be a better starting point, but you may still want to
-look a bit further back, in case some otherwise eligible commits were skipped
-due to [budget](#budget) constraints and such.
+If you've just initialized a new plan, you may want to skip the commits that
+were already reviewed as part of the previous release made from this branch (if
+any).  Usually, the last marked commit is a good place to start, however you
+may want to look a bit further back, in case some otherwise eligible commits
+were skipped due to [budget](#choosing-a-commit-budget) constraints and such.
+In particular, look for big gaps in between the marked commits, those may
+indicate that additional fixes were cherry-picked when the master branch had
+already moved on, such as when making a regression update (e.g. 4.17.1.1), and
+thus the gap(s) should be examined for useful material.
 
-#### Budget
+On the other hand, if you're editing a existing plan file, simply start at the
+first unmarked commit.
+
+Once you've chosen your starting point, bookmark it by adding the following
+line above it, where `<release>` is the release you're working on, e.g.
+4.17.2:
+
+```
+@@ <release> @@
+```
+
+TODO
+This will come in handy when you later [ask](#sharing-a-plan) for feedback.
+
+In the case of a newly initialized plan, you can also run:
+
+```
+$ git cherry-plan start <release>
+```
+
+This will mark any unmarked commits preceding the bookmark with a `-`.
+
+#### Choosing a commit budget
 
 A useful tool to help you pick and, in particular, *not* pick stuff, is a
 *commit budget*.  Normally, 50 is a good one for a typical maintenance release.
@@ -127,8 +163,23 @@ Of course, this number is just a ballpark figure and you may want to tweak it
 as necessary.
 
 Generally speaking, the budget is for code changes *only*, so any test and
-documentation additions and updates do *not* count and should always be picked
+documentation additions or updates do *not* count and should always be picked
 if possible.
+
+You can check how you're doing in terms of budget spending by running:
+
+```
+$ git cherry-plan status
+Your plan is up to date with 'master'.
+
+Candidate commits: 72
+   Picked commits: 23/50
+```
+
+The budget number is taken from the `Budget:` line at the top of the file and
+defaults to 50 for newly created plans.  As a little perk, if you add `#test`
+or `#docs` on a commit line in the file, that commit won't be counted against
+the budget here.
 
 ### Sharing a plan
 
@@ -141,31 +192,56 @@ You may need to do another round of review as new commits appear on the master
 branch, in which case delineate the new commits with a `@@ batch 2 @@` line.
 For any subsequent rounds, do the same and bump the number accordingly.
 
-If the file gets too long, feel free to just strip the no longer relevant `@@`
-"hunks" from the email to make it less noisy.  In a local copy, though, it's
-helpful to keep the full history.
+If the email gets too long, feel free to just strip the no longer relevant `@@`
+"hunks" in it.  In your local copy, though, make sure to keep the full history
+as it's useful.
 
 ### Applying a plan
 
-Once the plan is ready, you can apply it using the following script:
+Once the plan is ready, apply it to the branch by running:
 
 ```
-TBD
+$ git cherry-plan apply
 ```
 
-At this point, you can turn all `+` lines into `*` in the file to make it
-reflect the stable branch:
+This will go through each commit marked with a `+` and run `git cherry-pick -x`
+on it.
+
+In case a commit doesn't apply cleanly, the process will stop and a message
+will be printed.  At that point, proceed with conflict resolution as usual and
+when committing the changes, make sure to replace the "(cherry-picked from
+commit" line into "Backported from commit".  Then, run:
 
 ```
-$ sed -i 's/^\+/\*/' <stable>.patch
+$ git cherry-plan update
 ```
 
-This script is also useful when just crafting the plan as you can try it out to
-see if it applies cleanly and then reset the branch to the original tip, such
-as:
+This will update the `*` marks in the file so that they reflect the actual
+branch, i.e. any cherry-picks that were applied successfully above.  Continue
+the process by re-running `git cherry-plan apply`.  If another conflict occurs,
+repeat the same process until the plan is applied completely.
+
+It can be handy to also try this out from time to time while you're preparing
+the plan, to make sure you're not missing some pre-requisite commit(s).  You
+can either do this on the stable branch itself, or check out a throwaway one
+and just delete it when done.  The advantage of the latter is that, as you work
+your way through conflicts and run `git cherry-plan update`, the original plan
+file won't be touched.  To do this, run:
 
 ```
-$ git reset --hard origin/<stable>
+$ git checkout -b test-picks
+$ git cherry-plan init <stable>
+```
+
+This will copy the existing plan from the `<stable>` branch instead of creating
+a new one.  To get a fresh copy, just delete the plan with `git cherry-plan rm`
+while on the `test-picks` branch and then re-init it the same way.
+
+Alternatively, if you just wish to get a chronological list of picks (only
+commit hashes) to apply later by yourself, use:
+
+```
+$ git cherry-plan dump > cherry-picks.txt
 ```
 
 ## Cutting a release
