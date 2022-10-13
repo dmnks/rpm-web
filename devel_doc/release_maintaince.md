@@ -185,10 +185,10 @@ Once you're satisfied with your picks, send the plan as a plain-text email to
 the TBD mailing list and ask for feedback.  That way, people can reply directly
 to the individual commits inline.
 
-The following command will output the last `@@` hunk from the plan:
+The following command will output the `<release>` hunk from the plan:
 
 ```
-$ git cherry-plan format > email.txt
+$ git cherry-plan format <release> > email.txt
 ```
 
 Based on the feedback, make sure to update your local copy of the plan
@@ -196,8 +196,7 @@ accordingly.
 
 In case you need to do multiple rounds of review as new commits appear on the
 master branch, just insert a new hunk (e.g. `@@ <release> batch 2 @@`) to
-delineate the new commits, run `git cherry-plan pull` and repeat the whole
-process.
+delineate the new commits that you've got with `git cherry-plan pull`.
 
 ### Applying a plan
 
@@ -224,7 +223,7 @@ branch, i.e. any cherry-picks that were applied successfully above.  Continue
 the process by re-running `git cherry-plan apply`.  If another conflict occurs,
 repeat the same process until the plan is applied completely.
 
-It can be handy to also try this out from time to time while you're preparing
+It can also be handy to try this out from time to time while you're preparing
 the plan, to make sure you're not missing some pre-requisite commit(s).  You
 can either do this on the stable branch itself, or check out a throwaway one
 and just delete it when done.  The advantage of the latter is that, as you work
