@@ -185,18 +185,18 @@ Once you're satisfied with your picks, send the plan as a plain-text email to
 the TBD mailing list and ask for feedback.  That way, people can reply directly
 to the individual commits inline.
 
-The following command will output the `<release>` hunk from the plan:
+The following command will output the last hunk from the plan:
 
 ```
-$ git cherry-plan format <release> > email.txt
+$ git cherry-plan format > email.txt
 ```
 
 Based on the feedback, make sure to update your local copy of the plan
 accordingly.
 
 In case you need to do multiple rounds of review as new commits appear on the
-master branch, just insert a new hunk (e.g. `@@ <release> batch 2 @@`) to
-delineate the new commits that you've got with `git cherry-plan pull`.
+master branch, insert a new hunk (e.g. `@@ <release> batch 2 @@`) to delineate
+the new commits and repeat the process.
 
 ### Applying a plan
 
