@@ -244,7 +244,7 @@ Alternatively, if you just wish to get a chronological list of picks (only
 commit hashes) to apply later by yourself, use:
 
 ```
-$ git cherry-plan list > cherry-picks.txt
+$ git cherry-plan dump > cherry-picks.txt
 ```
 
 ## Cutting a release
