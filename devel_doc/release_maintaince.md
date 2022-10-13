@@ -136,9 +136,9 @@ release.
 Otherwise, if you're editing an existing plan file, simply start at the first
 unmarked commit.
 
-Once you've chosen your starting point, bookmark it by inserting the following
-line above the respective commit, where `<release>` is the release you're
-preparing, e.g. 4.17.2:
+Once you've chosen your starting point, insert a hunk identifier above the
+respective commit, where `<release>` is the release you're preparing, e.g.
+4.17.2:
 
 ```
 @@ <release> @@
@@ -183,16 +183,21 @@ the budget here.
 
 Once you're satisfied with your picks, send the plan as a plain-text email to
 the TBD mailing list and ask for feedback.  That way, people can reply directly
-to the individual commits inline.  Based on the feedback, make sure to update
-your local copy of the plan accordingly.
+to the individual commits inline.
 
-You may need to do another round of review as new commits appear on the master
-branch, in which case delineate the new commits with a `@@ batch 2 @@` line.
-For any subsequent rounds, do the same and bump the number accordingly.
+The following command will output the last `@@` hunk from the plan:
 
-If the email gets too long, feel free to just strip the no longer relevant `@@`
-"hunks" in it.  In your local copy, though, make sure to keep the full history
-as it's useful.
+```
+$ git cherry-plan format > email.txt
+```
+
+Based on the feedback, make sure to update your local copy of the plan
+accordingly.
+
+In case you need to do multiple rounds of review as new commits appear on the
+master branch, just insert a new hunk (e.g. `@@ <release> batch 2 @@`) to
+delineate the new commits, run `git cherry-plan pull` and repeat the above to
+send a new email.
 
 ### Applying a plan
 
