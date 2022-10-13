@@ -196,8 +196,8 @@ accordingly.
 
 In case you need to do multiple rounds of review as new commits appear on the
 master branch, just insert a new hunk (e.g. `@@ <release> batch 2 @@`) to
-delineate the new commits, run `git cherry-plan pull` and repeat the above to
-send a new email.
+delineate the new commits, run `git cherry-plan pull` and repeat the whole
+process.
 
 ### Applying a plan
 
