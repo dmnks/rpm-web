@@ -146,8 +146,8 @@ respective commit, where `<release>` is the release you're preparing, e.g.
 
 This will come in handy when you [ask](#sharing-a-plan) for feedback later.
 
-In the case of a new plan, you can now also mark all preceding commits with a
-`-` like so:
+In the case of a new plan, make sure to mark all preceding commits with a `-`
+like so:
 
 ```
 $ git cherry-plan start <release>
@@ -211,8 +211,8 @@ on it.
 
 In case a commit doesn't apply cleanly, the process will stop and a message
 will be printed.  At that point, proceed with conflict resolution as usual and
-when committing the changes, make sure to replace the "(cherry-picked from
-commit" line into "Backported from commit".  Then, run:
+when committing the changes, make sure to replace the line "(cherry-picked from
+commit" with "Backported from commit", then run:
 
 ```
 $ git cherry-plan update
@@ -225,10 +225,11 @@ repeat the same process until the plan is applied completely.
 
 It can also be handy to try this out from time to time while you're preparing
 the plan, to make sure you're not missing some pre-requisite commit(s).  You
-can either do this on the stable branch itself, or check out a throwaway one
-and just delete it when done.  The advantage of the latter is that, as you work
-your way through conflicts and run `git cherry-plan update`, the original plan
-file won't be touched.  To do this, run:
+can either do this on the stable branch itself and then reset it to the
+original tip when done, or check out a throwaway one and just delete it
+afterwards.  The advantage of the latter is that, as you work your way through
+conflicts and `git cherry-plan update`, the original plan file won't be
+touched.  To do this, run:
 
 ```
 $ git checkout -b test-picks
@@ -236,8 +237,9 @@ $ git cherry-plan init <stable>
 ```
 
 This will copy the existing plan from the `<stable>` branch instead of creating
-a new one.  To get a fresh copy, just delete the plan with `git cherry-plan rm`
-while on the `test-picks` branch and then re-init it the same way.
+a new one.  To get a fresh copy again later, just delete the plan with `git
+cherry-plan rm` while on the `test-picks` branch and then re-initialize it the
+same way.
 
 Alternatively, if you just wish to get a chronological list of picks (only
 commit hashes) to apply later by yourself, use:
