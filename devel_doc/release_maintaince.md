@@ -38,10 +38,9 @@ of commits that you intend to pick.  This approach allows you to:
 
 * Tweak the plan easily, without having to (re)do any conflict resolution
 
-* Ensure commits are always picked in chronological order
+* Use a shell script to automate the cherry-picking
 
-* Use a shell script to automate the cherry-picking and try out different
-  variants of the plan to see which apply cleanly
+* Try out different variants of the plan to see which apply cleanly
 
 The following text describes one specific workflow involving such a text file
 and a simple helper script.
