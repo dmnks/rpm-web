@@ -24,7 +24,7 @@ commit hash" to mark the difference.
 
 ## Selecting commits
 
-Crafting a maintenance release is inherently a manual process which starts by
+Crafting a stable release is inherently a manual process which starts by
 selecting suitable commits from the master branch to cherry-pick or backport
 into the respective stable branch.
 
@@ -49,7 +49,7 @@ The rest of this section describes a workflow that involves such a text file
 
 ### Installing the script
 
-Download the script from here, make it executable and from your RPM checkout,
+Download the script from TBD, make it executable and from your RPM checkout,
 add a git alias for it:
 
 ```
@@ -135,7 +135,7 @@ cherry-picks, leaving gaps behind that may contain useful material for the next
 maintenance update (e.g. 4.17.2).
 
 To avoid such guesswork when making a future release, you can reuse the
-previous plan when creating a new one like so:
+previous plan like so:
 
 ```
 $ git cherry-plan init <last-release>
