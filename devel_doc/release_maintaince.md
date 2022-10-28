@@ -235,6 +235,7 @@ commit(s), like so:
 ```
 $ git checkout -b test-picks
 $ git cherry-plan init <release>
+$ git cherry-plan apply
 ```
 
 ## Cutting a release
