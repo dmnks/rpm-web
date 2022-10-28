@@ -228,12 +228,9 @@ branch, i.e. any cherry-picks that were applied successfully above.  Continue
 the process by re-running `git cherry-plan apply`.  If another conflict occurs,
 repeat the same process until the plan is applied completely.
 
-It can also be handy to try this out from time to time while you're preparing
-the plan, to make sure you're not missing some pre-requisite commit(s).  You
-can either do this on the actual branch and then reset it to the original tip
-when done, or create a throwaway one and delete it afterwards.  The advantage
-of the latter is that, as you work your way through conflicts and `git
-cherry-plan update`, the original plan file won't be touched, for example:
+While preparing the plan, it can be handy to try this out on a throwaway branch
+every now and then, to make sure you're not missing some pre-requisite
+commit(s), like so:
 
 ```
 $ git checkout -b test-picks
