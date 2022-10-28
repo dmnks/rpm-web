@@ -190,7 +190,7 @@ Once you're satisfied with your picks, send the plan as a plain-text email to
 the TBD mailing list and ask for feedback.  That way, people can reply directly
 to the individual commits inline.
 
-The following command will output the last hunk from the plan:
+The following command will output the `@@ start @@` hunk from the plan:
 
 ```
 $ git cherry-plan format > email.txt
@@ -200,8 +200,8 @@ Based on the feedback, make sure to update your local copy of the plan
 accordingly.
 
 In case you need to do multiple rounds of review as new commits appear on the
-master branch, insert a new hunk (e.g. `@@ <release> batch 2 @@`) to delineate
-the new commits and repeat the process.
+master branch, delineate the new ones with a hunk (e.g. `@@ batch 2 @@`) and
+send another email.
 
 ### Applying a plan
 
@@ -230,27 +230,14 @@ repeat the same process until the plan is applied completely.
 
 It can also be handy to try this out from time to time while you're preparing
 the plan, to make sure you're not missing some pre-requisite commit(s).  You
-can either do this on the stable branch itself and then reset it to the
-original tip when done, or check out a throwaway one and just delete it
-afterwards.  The advantage of the latter is that, as you work your way through
-conflicts and `git cherry-plan update`, the original plan file won't be
-touched.  To do this, run:
+can either do this on the actual branch and then reset it to the original tip
+when done, or create a throwaway one and delete it afterwards.  The advantage
+of the latter is that, as you work your way through conflicts and `git
+cherry-plan update`, the original plan file won't be touched, for example:
 
 ```
 $ git checkout -b test-picks
-$ git cherry-plan init <stable>
-```
-
-This will copy the existing plan from the `<stable>` branch instead of creating
-a new one.  To get a fresh copy again later, just delete the plan with `git
-cherry-plan rm` while on the `test-picks` branch and then re-initialize it the
-same way.
-
-Alternatively, if you just wish to get a chronological list of picks (only
-commit hashes) to apply later by yourself, use:
-
-```
-$ git cherry-plan dump > cherry-picks.txt
+$ git cherry-plan init <release>
 ```
 
 ## Cutting a release
