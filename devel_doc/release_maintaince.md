@@ -66,10 +66,9 @@ $ git checkout -b <release> <stable>
 $ git cherry-plan init
 ```
 
-This will create a file with a chronological list of commits on the master
-branch since the branching point of `<stable>`, marking those that have been
-cherry-picked or backported already with an `*`.  To edit the file in your
-`$EDITOR`, run:
+This will create a file with a chronological list of commits on master since
+the branching point of `<stable>`, marking those that have been cherry-picked
+or backported already with an `*`.  To edit the file in your `$EDITOR`, run:
 
 ```
 $ git cherry-plan edit
@@ -79,13 +78,11 @@ The file uses a patch-like format and is stored as
 `$HOME/.cherry-plan/<release>.patch`.  The extension ensures you'll get nice
 color highlighting out-of-the-box in any sensible text editor.
 
-To pull new commits from the master branch into the plan, use:
+To later pull new commits from the master branch into the plan, use:
 
 ```
 $ git cherry-plan pull
 ```
-
-This will print the added commits, too.
 
 ### Editing a plan
 
@@ -123,17 +120,19 @@ yourself:
 If the answer to any of the above is "yes" then it's almost certainly not
 appropriate for a stable maintenance release.  Mark such a commit with a `-`.
 
+A security or regression update (`rpm-X.Y.Z.U`) may imply much stricter rules,
+such as that only specific patches or important bugfixes may be included.
+
 #### Choosing a starting point
 
 You may want to skip any commits that were already reviewed in the previous
-release, if there's one.  Typically, the last marked commit is a good
-indication of where the review stopped, but it's good practice to look a bit
-further back, in case some otherwise eligible commits were skipped due to
-[budget](#choosing-a-commit-budget) constraints and such.  In particular,
-regression or security updates (e.g. 4.17.1.1) usually include very specific
-cherry-picks, leaving gaps behind that may contain useful material for the next
-maintenance update (e.g. 4.17.2).
+release (if any).  Typically, the last marked commit is a good indication of
+where the review stopped, but it's a good idea to look a bit further back, in
+case some otherwise eligible commits were skipped due to stricter rules of the
+last release (e.g. `rpm-X.Y.Z.U`) or [budget](#choosing-a-commit-budget)
+constraints.
 
+TODO
 To avoid such guesswork when making a future release, you can reuse the
 previous plan like so:
 
@@ -143,9 +142,9 @@ $ git cherry-plan init <last-release>
 
 Then, you'll simply start at the first unmarked commit.
 
-*Note:* If you're making a maintenance update (e.g. 4.17.2) but the last one
-was a regression or security update (e.g. 4.17.1.1), you may want to reuse the
-4.17.1 plan instead.
+*Note:* If you're preparing an `rpm-X.Y.Z+1` release and there already was an
+`rpm-X.Y.Z.U` plan, you may still want to reuse the `rpm-X.Y.Z` plan as the `-`
+semantics in the other one is different (more strict).
 
 Once you've chosen your starting point, insert (move) the `@@ start @@` hunk
 above the respective commit.  This will act as a bookmark for you and for
