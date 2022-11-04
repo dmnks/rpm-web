@@ -120,7 +120,7 @@ yourself:
 If the answer to any of the above is "yes" then it's almost certainly not
 appropriate for a stable maintenance release.  Mark such a commit with a `-`.
 
-A security or regression update (`rpm-X.Y.Z.U`) may imply much stricter rules,
+A security or regression update (rpm-X.Y.Z.U) may imply much stricter rules,
 such as that only specific patches or important bugfixes may be included.
 
 #### Choosing a starting point
@@ -129,7 +129,7 @@ You may want to skip any commits that were already reviewed in the previous
 release (if any).  Typically, the last marked commit is a good indication of
 where the review stopped, but it's a good idea to look a bit further back, in
 case some otherwise eligible commits were skipped due to stricter rules of the
-last release (e.g. `rpm-X.Y.Z.U`) or [budget](#choosing-a-commit-budget)
+last release (e.g. rpm-X.Y.Z.U) or [budget](#choosing-a-commit-budget)
 constraints.
 
 TODO
@@ -142,8 +142,8 @@ $ git cherry-plan init <last-release>
 
 Then, you'll simply start at the first unmarked commit.
 
-*Note:* If you're preparing an `rpm-X.Y.Z+1` release and there already was an
-`rpm-X.Y.Z.U` plan, you may still want to reuse the `rpm-X.Y.Z` plan as the `-`
+*Note:* If you're preparing an rpm-X.Y.Z+1 release and there already was an
+rpm-X.Y.Z.U plan, you may still want to reuse the rpm-X.Y.Z plan as the `-`
 semantics in the other one is different (more strict).
 
 Once you've chosen your starting point, insert (move) the `@@ start @@` hunk
