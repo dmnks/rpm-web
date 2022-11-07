@@ -22,6 +22,9 @@ see if it's resolvable with a suitable upstream commit and if not, when
 fixing manually change the "cherry-picked from" message into "Backported from
 commit hash" to mark the difference.
 
+We also do smaller regression and/or security ("micro") updates on stable
+branches, those get a fourth version number, e.g. rpm-4.15.1.1.
+
 ## Selecting commits
 
 Crafting a stable release is inherently a manual process which starts by
@@ -120,21 +123,16 @@ yourself:
 If the answer to any of the above is "yes" then it's almost certainly not
 appropriate for a stable maintenance release.  Mark such a commit with a `-`.
 
-A security or regression update (rpm-X.Y.Z.U) may imply much stricter rules,
-such as that only specific patches or important bugfixes may be included.
-
 #### Choosing a starting point
 
-You may want to skip any commits that were already reviewed in the previous
-release (if any).  Typically, the last marked commit is a good indication of
-where the review stopped, but it's a good idea to look a bit further back, in
-case some otherwise eligible commits were skipped due to stricter rules of the
-last release (e.g. rpm-X.Y.Z.U) or [budget](#choosing-a-commit-budget)
-constraints.
+You may want to skip any commits that were already reviewed in the last release
+(if any).  Typically, the last marked commit is a good indication of where the
+review stopped, but it's a good idea to look a bit further back, in case some
+otherwise appropriate commits were skipped in the last release (e.g.
+rpm-X.Y.Z.M) or exceeded the [budget](#choosing-a-commit-budget).
 
-TODO
-To avoid such guesswork when making a future release, you can reuse the
-previous plan like so:
+To avoid such guesswork when making a future release, you can initialize a new
+plan as a copy of the previous one like so:
 
 ```
 $ git cherry-plan init <last-release>
@@ -142,9 +140,9 @@ $ git cherry-plan init <last-release>
 
 Then, you'll simply start at the first unmarked commit.
 
-*Note:* If you're preparing an rpm-X.Y.Z+1 release and there already was an
-rpm-X.Y.Z.U plan, you may still want to reuse the rpm-X.Y.Z plan as the `-`
-semantics in the other one is different (more strict).
+The release you copy should be of the same kind as the one you're preparing so
+that the existing markers have the same semantics.  For example, you would
+initialize rpm-X.Y.Z+1 from rpm-X.Y.Z even if rpm-X.Y.Z.M has been released.
 
 Once you've chosen your starting point, insert (move) the `@@ start @@` hunk
 above the respective commit.  This will act as a bookmark for you and for
