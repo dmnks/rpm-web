@@ -156,9 +156,7 @@ $ git cherry-plan start
 #### Choosing a commit budget
 
 A useful tool to help you pick and, in particular, *not* pick stuff, is a
-"commit budget".  Normally, 50 is a good one for a typical stable release.  Of
-course, this number is just a ballpark figure and you may want to tweak it as
-necessary.
+"commit budget".  As an easy to remember ballpark figure, 50 is as good as any.
 
 Generally speaking, the budget is for code changes *only*, so any test and
 documentation additions or updates do *not* count and should always be picked
@@ -214,7 +212,7 @@ commit" with "Backported from commit", then run:
 $ git cherry-plan update
 ```
 
-This will update the `*` marks in the file so that they reflect the actual
+This will update the `*` markers in the file so that they reflect the actual
 branch, i.e. any cherry-picks that were applied successfully above.  Continue
 the process by re-running `git cherry-plan apply`.  If another conflict occurs,
 repeat the same process until the plan is applied completely.
