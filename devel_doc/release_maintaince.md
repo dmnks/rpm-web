@@ -58,7 +58,7 @@ $ git config alias.cherry-plan '!/path/to/script'
 
 ### Initializing a plan
 
-To create a new plan for a stable branch (e.g. `rpm-4.15.x`), run:
+To initialize a plan for a stable branch (e.g. rpm-4.15.x), run:
 
 ```
 $ git checkout <stable>
@@ -82,15 +82,6 @@ To pull new commits from master into the plan at any time, use:
 ```
 $ git cherry-plan pull
 ```
-
-If you prefer creating a topic branch for the release (e.g. `rpm-4.15.1`), run:
-
-```
-$ git checkout -b <release>
-$ git cherry-plan init <stable>
-```
-
-This will create a symlink to the stable plan instead of creating a new one.
 
 ### Editing a plan
 
@@ -223,11 +214,10 @@ commit(s):
 
 ```
 $ git checkout -b test-picks
-$ git cherry-plan init --copy <stable>
+$ git cherry-plan init <stable>
 ```
 
-This will make a copy of the stable plan instead of creating a new one, so that
-the original plan isn't touched.
+This will make a copy of the stable plan instead of creating a new one.
 
 ## Cutting a release
 
