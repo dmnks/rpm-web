@@ -22,9 +22,6 @@ see if it's resolvable with a suitable upstream commit and if not, when
 fixing manually change the "cherry-picked from" message into "Backported from
 commit hash" to mark the difference.
 
-We also do smaller regression and/or security ("micro") updates on stable
-branches, those get a fourth version number, e.g. rpm-4.15.1.1.
-
 ## Selecting commits
 
 Crafting a stable release is inherently a manual process which starts by
@@ -47,8 +44,8 @@ and mark those that you intend to pick.  This approach allows you to:
 
 * Try out different variants of the plan to see which apply cleanly
 
-The rest of this section describes a workflow that involves such a text file
-(called a "plan") and a helper script.
+The rest of this section describes a workflow that involves such a text file,
+one per stable branch, and a helper script.
 
 ### Installing the script
 
@@ -61,31 +58,39 @@ $ git config alias.cherry-plan '!/path/to/script'
 
 ### Initializing a plan
 
-To start working on a new release from a stable branch (e.g. `rpm-4.17.2` and
-`rpm-4.17.x`, respectively), run:
+To create a new plan for a stable branch (e.g. `rpm-4.15.x`), run:
 
 ```
-$ git checkout -b <release> <stable>
+$ git checkout <stable>
 $ git cherry-plan init
 ```
 
 This will create a file with a chronological list of commits on master since
-the branching point of `<stable>`, marking those that have been cherry-picked
-or backported already with an `*`.  To edit the file in your `$EDITOR`, run:
+the branching point, marking those that have been cherry-picked or backported
+already with an `*`.  To edit the file in your `$EDITOR`, run:
 
 ```
 $ git cherry-plan edit
 ```
 
 The file uses a patch-like format and is stored as
-`$HOME/.cherry-plan/<release>.patch`.  The extension ensures you'll get nice
+`$HOME/.cherry-plan/<stable>.patch`.  The extension ensures you'll get nice
 color highlighting out-of-the-box in any sensible text editor.
 
-To later pull new commits from the master branch into the plan, use:
+To pull new commits from master into the plan at any time, use:
 
 ```
 $ git cherry-plan pull
 ```
+
+If you prefer creating a topic branch for the release (e.g. `rpm-4.15.1`), run:
+
+```
+$ git checkout -b <release>
+$ git cherry-plan init <stable>
+```
+
+This will create a symlink to the stable plan instead of creating a new one.
 
 ### Editing a plan
 
@@ -126,30 +131,23 @@ appropriate for a stable maintenance release.  Mark such a commit with a `-`.
 #### Choosing a starting point
 
 You may want to skip any commits that were already reviewed in the last release
-(if any).  Typically, the last marked commit is a good indication of where the
-review stopped, but it's a good idea to look a bit further back, in case some
-otherwise appropriate commits were skipped in the last release (e.g.
-rpm-X.Y.Z.M) or exceeded the [budget](#choosing-a-commit-budget).
+(if any).  For a brand new plan, the last marked commit is a good indication of
+where the review stopped, but it's a good idea to look a bit further back, in
+case some otherwise suitable commits were skipped due to
+[budget](#choosing-a-commit-budget) constraints and such.  In particular,
+regression or security updates (e.g. rpm-4.15.1.1) tend to include very
+specific cherry-picks, leaving gaps behind that may contain useful material for
+the next stable release.
 
-To avoid such guesswork when making a future release, you can initialize a new
-plan as a copy of the previous one like so:
+Otherwise, when editing an existing plan, simply start at the first unmarked
+commit.
 
-```
-$ git cherry-plan init <last-release>
-```
+Once you've chosen your starting point, insert a `@@ start @@` line above the
+respective commit.  This "hunk" will act as a bookmark for you and for others
+when you [ask](#sharing-a-plan) for feedback later.
 
-Then, you'll simply start at the first unmarked commit.
-
-The release you copy should be of the same kind as the one you're preparing so
-that the existing markers have the same semantics.  For example, you would
-initialize rpm-X.Y.Z+1 from rpm-X.Y.Z even if rpm-X.Y.Z.M has been released.
-
-Once you've chosen your starting point, insert (move) the `@@ start @@` hunk
-above the respective commit.  This will act as a bookmark for you and for
-others when you [ask](#sharing-a-plan) for feedback later.
-
-In the case of a brand new plan, also make sure to mark all commits preceding
-the hunk with a `-` by running:
+In the case of a brand new plan, make sure to mark all commits preceding the
+hunk with a `-` by running:
 
 ```
 $ git cherry-plan start
@@ -158,9 +156,9 @@ $ git cherry-plan start
 #### Choosing a commit budget
 
 A useful tool to help you pick and, in particular, *not* pick stuff, is a
-"commit budget".  Normally, 50 is a good one for a typical maintenance release.
-Of course, this number is just a ballpark figure and you may want to tweak it
-as necessary.
+"commit budget".  Normally, 50 is a good one for a typical stable release.  Of
+course, this number is just a ballpark figure and you may want to tweak it as
+necessary.
 
 Generally speaking, the budget is for code changes *only*, so any test and
 documentation additions or updates do *not* count and should always be picked
@@ -196,10 +194,6 @@ $ git cherry-plan format > email.txt
 Based on the feedback, make sure to update your local copy of the plan
 accordingly.
 
-In case you need to do multiple rounds of review as new commits appear on the
-master branch, delineate the new ones with a hunk (e.g. `@@ batch 2 @@`) and
-send another email.
-
 ### Applying a plan
 
 Once the plan is ready, apply it to the branch by running:
@@ -227,13 +221,15 @@ repeat the same process until the plan is applied completely.
 
 While preparing the plan, it can be handy to try this out on a throwaway branch
 every now and then, to make sure you're not missing some pre-requisite
-commit(s), like so:
+commit(s):
 
 ```
 $ git checkout -b test-picks
-$ git cherry-plan init <release>
-$ git cherry-plan apply
+$ git cherry-plan init --copy <stable>
 ```
+
+This will make a copy of the stable plan instead of creating a new one, so that
+the original plan isn't touched.
 
 ## Cutting a release
 
