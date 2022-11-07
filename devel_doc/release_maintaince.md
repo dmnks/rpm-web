@@ -164,9 +164,9 @@ Candidate commits: 72
 ```
 
 The budget number is taken from the `Budget:` line at the top of the file and
-defaults to 50 for newly created plans.  As a little perk, if you add `#test`
-or `#docs` on a commit line in the file, that commit won't be counted against
-the budget here.
+defaults to 50 for newly created plans.  As a little perk, if you add `#cheap`
+on a commit line in the file, that commit won't be counted against the budget
+here.
 
 ### Sharing a plan
 
