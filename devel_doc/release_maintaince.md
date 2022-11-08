@@ -70,8 +70,8 @@ $ git cherry-plan edit
 ```
 
 The file uses a patch-like format and is stored as
-`$HOME/.cherry-plan/<stable>.patch`.  The extension ensures you'll get nice
-color highlighting out-of-the-box in any sensible text editor.
+`~/.cherry-plan/<stable>.patch`.  The extension ensures you'll get nice color
+highlighting out-of-the-box in any sensible text editor.
 
 To pull new commits from master into the plan at any time, use:
 
@@ -164,6 +164,12 @@ The budget number is taken from the `Budget:` line at the top of the file and
 defaults to 30 for newly created plans.  As a little perk, if you add `#test`
 or `#docs` on a commit line in the file, that commit won't be counted against
 the budget here.
+
+#### VIM config
+
+If you use VIM, you can add [this](plan.vim) snippet into your `~/.vimrc` to
+cycle through markers on the current line with the `space` key and do a `git
+show` with the `enter` key.
 
 ### Sharing a plan
 
