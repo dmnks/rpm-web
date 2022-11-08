@@ -1,0 +1,148 @@
+#!/bin/bash
+
+PROGRAM=cherry-plan
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+UPSTREAM=master
+ABBREV=10
+README="\
+# Commands:
+# pick <commit> = use commit
+# drop <commit> = remove commit, not suitable
+# skip <commit> = remove commit, already applied
+#      <commit> = remove commit, not decided yet
+#
+# These lines MUST NOT be re-ordered or removed; they are executed from top to
+# bottom."
+
+usage() {
+    echo "\
+usage: git $PROGRAM <command> [<args>]
+
+Manage persistent rebase-like todo lists (\"plans\") to cherry-pick commits
+onto stable branches.
+
+Useful for crafting larger cherry-pick batches and collaborating on them, e.g.
+when preparing stable releases.
+
+Commands
+    make [<file> [<upstream> [<limit>]]]
+                        create plan for current branch from commits on
+                        <upstream> branch ($UPSTREAM if omitted), exclude
+                        commits up to (and including) <limit> (common ancestor
+                        if omitted), save to <file> (<branch>.plan if omitted)
+    pull [<file> [<upstream>]]
+                        append new upstream commits to given plan
+    status [<file> [<upstream>]]
+                        show status of given plan
+    apply [<file>]      apply given plan
+    mark [<file>]       mark applied commits in given plan"
+    exit 1
+}
+
+print_readme() {
+    local commit=$(git rev-parse $3)
+    echo >> $1
+    echo "# Rebase $(abbrev $2)..$(abbrev $commit) onto $BRANCH" >> $1
+    echo "#" >> $1
+    echo "$README" >> $1
+}
+
+fail_exists() {
+    if [ -f $1 ]; then
+        echo "File $1 already exists" >&2
+        exit 1
+    fi
+}
+
+fail_missing() {
+    if [ ! -f $1 ]; then
+        echo "File $1 not found" >&2
+        exit 1
+    fi
+}
+
+get_hash() {
+    sed 's/^.\{5\}//' | cut -d' ' -f1
+}
+
+abbrev() {
+    echo $1 | cut -c -$ABBREV
+}
+
+get_applied() {
+    local log=$(git log --format="%b" $1..)
+    echo "$log" | sed -n 's/^(cherry picked from commit \(.*\))/\1/p'
+    echo "$log" | sed -n 's/^Backported from commit \(.*\)/\1/p'
+}
+
+get_base() {
+    git merge-base HEAD $1
+}
+
+get_last() {
+    sed '/^#/d; /^$/d' $1 | tail -1 | get_hash
+}
+
+get_limit() {
+    sed -n 's/^# Rebase \(.*\)\.\..*$/\1/p' $1
+}
+
+mark() {
+    sed -i "s/^skip /     /" $1
+    get_applied $2 | while read line; do
+        sed -i "s/^.\{5\}\($(abbrev $line)\)/skip \1/" $1
+    done
+}
+
+log() {
+    git log --reverse --abbrev=$ABBREV --format="$2 %h %s" $1
+}
+
+CMD=$1
+shift
+FILE=${1:-$BRANCH.plan}
+shift
+if [ "$CMD" == "make" ]; then
+    fail_exists $FILE
+    upstream=${1:-$UPSTREAM}
+    limit=${2:-$(get_base $upstream)}
+    echo "# vim:syntax=gitrebase" > $FILE
+    log $limit..$upstream drop >> $FILE
+    mark $FILE $limit
+    print_readme $FILE $limit $upstream
+    echo $FILE
+elif [ "$CMD" == "pull" ]; then
+    fail_missing $FILE
+    upstream=${1:-$UPSTREAM}
+    limit=$(get_limit $FILE)
+    last=$(get_last $FILE)
+    sed -i "/^.\{5\}$last/q" $FILE
+    log $last..$upstream "    " | tee -a $FILE
+    print_readme $FILE $limit $upstream
+elif [ "$CMD" == "status" ]; then
+    fail_missing $FILE
+    upstream=${1:-$UPSTREAM}
+    count=$(git rev-list --count $(get_last $FILE)..$upstream)
+    picked=$(grep '^pick ' $FILE | wc -l)
+    unmarked=$(grep '^     ' $FILE | wc -l)
+    if [ "$count" == "0" ]; then
+        echo "Your plan is up to date with '$upstream'."
+    else
+        echo "Your plan is behind '$upstream' by $count commits."
+    fi
+    echo "$picked picked, $unmarked unmarked"
+elif [ "$CMD" == "apply" ]; then
+    fail_missing $FILE
+    error=0
+    grep '^pick ' $FILE | while read line; do
+        commit=$(echo "$line" | get_hash)
+        echo "Applying commit $commit"
+        git cherry-pick -x $commit >/dev/null || false
+    done || exit 1
+    echo "Plan applied successfully!"
+elif [ "$CMD" == "mark" ]; then
+    fail_missing $FILE
+    mark $FILE $(get_limit $FILE)
+else
+    usage
+fi
