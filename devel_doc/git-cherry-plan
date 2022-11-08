@@ -1,0 +1,160 @@
+#!/bin/bash
+
+PROGRAM=cherry-plan
+DIR=$HOME/.$PROGRAM
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+EXT=patch
+FILE=$DIR/$BRANCH.$EXT
+
+UPSTREAM=master
+BASE=$(git merge-base HEAD $UPSTREAM)
+HUNK="@@ start @@"
+
+README="\
+# Cherry-pick plan from $UPSTREAM onto $BRANCH
+#
+# These lines MUST NOT be re-ordered or removed.
+# 
+# Key:
+# + <commit> = use commit
+# - <commit> = do not use commit
+# * <commit> = commit already on branch
+#   <commit> = candidate commit
+#
+# Priority:
+# 1) regression, crash and security fixes
+# 2) user visible breakage with no workarounds
+# 3) user visible breakage with major impact
+# 4) other major impact stuff (if budget allows)
+# 
+# Budget: 30 commits
+# Lines containing #test or #docs do not count against the budget.
+"
+
+usage() {
+    echo "\
+Usage: git $PROGRAM COMMAND [ARG]
+
+Plan commits to be cherry-picked from master onto the current branch.
+
+Uses a patch-like text file listing all commits on master since the branching
+point, with a README printed at the top.
+
+Commands:
+    init [BRANCH]       create new plan for current branch
+                        (or copy from existing BRANCH)
+    edit                open plan in \$EDITOR
+    rm                  remove plan
+    ls                  list all plans
+    pull                append new commits from master
+    update              mark already present commits
+    apply               apply plan
+    start               mark commits preceding $HUNK with -
+    format              print plan for e-mail review
+                        (only commits following $HUNK)
+    dump                print commits marked with + (only hashes)
+    status              show plan status"
+    exit 1
+}
+
+ensure_exists() {
+    if [ ! -f $FILE ]; then
+        echo "No plan exists for this branch yet" >&2
+        exit 1
+    fi
+}
+
+ensure_not_exists() {
+    if [ -f $FILE ]; then
+        echo "This branch already has a plan" >&2
+        exit 1
+    fi
+}
+
+copied() {
+    local log=$(git log --format="%b" $BASE..)
+    echo "$log" | sed -n 's/^(cherry picked from commit \(.*\))/\1/p'
+    echo "$log" | sed -n 's/^Backported from commit \(.*\)/\1/p'
+}
+
+mark() {
+    sed -i "s/^\* /  /" $1
+    copied | while read line; do
+        sed -i "s/^.\{2\}\($line\)/\* \1/" $1
+    done
+}
+
+log() {
+    git log --reverse --format="  %H %s" $1..$UPSTREAM
+}
+
+budget() {
+    sed -n 's/^# Budget: \(.*\) commits$/\1/p' $1
+}
+
+gethash() {
+    sed 's/^.\{2\}//' | cut -d' ' -f1
+}
+
+CMD=$1
+shift
+if [ "$CMD" == "init" ]; then
+    ensure_not_exists
+    mkdir -p $DIR
+    if [ -z "$1" ]; then
+        echo "$README" > $FILE
+        log $BASE >> $FILE
+        mark $FILE
+    else
+        cp $DIR/$1.$EXT $FILE
+        sed -i "s/^\(# Cherry-pick plan .* onto\) .*$/\1 $BRANCH/" $FILE
+    fi
+elif [ "$CMD" == "pull" ]; then
+    ensure_exists
+    log $(tail -1 $FILE | gethash) | tee -a $FILE
+elif [ "$CMD" == "update" ]; then
+    ensure_exists
+    mark $FILE
+elif [ "$CMD" == "start" ]; then
+    ensure_exists
+    sed -i "0,/^$HUNK$/ s/^  /\- /" $FILE
+elif [ "$CMD" == "edit" ]; then
+    ensure_exists
+    $EDITOR $FILE
+elif [ "$CMD" == "rm" ]; then
+    ensure_exists
+    rm -i $FILE
+elif [ "$CMD" == "ls" ]; then
+    ls -1 $DIR | sed "s/\.$EXT\$//"
+elif [ "$CMD" == "format" ]; then
+    ensure_exists
+    sed "/^[^#].*$/,$ d" $FILE
+    sed "1,/^$HUNK$/ d" $FILE
+elif [ "$CMD" == "dump" ]; then
+    ensure_exists
+    grep '^\+ ' $FILE | gethash
+elif [ "$CMD" == "status" ]; then
+    ensure_exists
+    last=$(tail -1 $FILE | gethash)
+    count=$(git rev-list --count $last..$UPSTREAM)
+    if [ "$count" == "0" ]; then
+        echo "Your plan is up to date with '$UPSTREAM'."
+    else
+        echo "Your plan is behind '$UPSTREAM' by $count commits."
+    fi
+    echo
+    echo "Candidate commits: $(grep '^  '  $FILE | wc -l)"
+    echo "   Picked commits: $(grep '^\+ ' $FILE | \
+                               grep -v '#\(test\|docs\)' | \
+                               wc -l)/$(budget $FILE)"
+elif [ "$CMD" == "apply" ]; then
+    ensure_exists
+    grep '^\+ ' $FILE | while read line; do
+        commit=$(echo "$line" | gethash)
+        echo "Applying commit $commit"
+        git cherry-pick -x $commit >/dev/null || exit 1
+    done
+    echo "Plan applied successfully!"
+else
+    usage
+fi

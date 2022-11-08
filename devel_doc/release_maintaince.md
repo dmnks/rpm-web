@@ -49,12 +49,8 @@ one per stable branch, and a helper script.
 
 ### Installing the script
 
-Download the script from TBD, make it executable and from your RPM checkout,
-add a git alias for it:
-
-```
-$ git config alias.cherry-plan '!/path/to/script'
-```
+[Download](git-cherry-plan) the script, make it executable and put it into your
+`$PATH`.
 
 ### Initializing a plan
 
@@ -133,9 +129,9 @@ the next stable release.
 Otherwise, when editing an existing plan, simply start at the first unmarked
 commit.
 
-Once you've chosen your starting point, insert a `@@ start @@` line above the
-respective commit.  This "hunk" will act as a bookmark for you and for others
-when you [ask](#sharing-a-plan) for feedback later.
+Once you've chosen your starting point, insert (move) the `@@ start @@` line
+above the respective commit.  This "hunk" will act as a bookmark for you and
+for others when you [ask](#sharing-a-plan) for feedback later.
 
 In the case of a brand new plan, make sure to mark all commits preceding the
 hunk with a `-` by running:
@@ -147,7 +143,8 @@ $ git cherry-plan start
 #### Choosing a commit budget
 
 A useful tool to help you pick and, in particular, *not* pick stuff, is a
-"commit budget".  As an easy to remember ballpark figure, 50 is as good as any.
+"commit budget".  For stable releases, 30 is a good ballpark figure, but of
+course, feel free to tweak it as needed.
 
 Generally speaking, the budget is for code changes *only*, so any test and
 documentation additions or updates do *not* count and should always be picked
@@ -159,20 +156,20 @@ You can check how you're doing in terms of budget spending by running:
 $ git cherry-plan status
 Your plan is up to date with 'master'.
 
-Candidate commits: 72
-   Picked commits: 23/50
+Candidate commits: 54
+   Picked commits: 12/30
 ```
 
 The budget number is taken from the `Budget:` line at the top of the file and
-defaults to 50 for newly created plans.  As a little perk, if you add `#cheap`
-on a commit line in the file, that commit won't be counted against the budget
-here.
+defaults to 30 for newly created plans.  As a little perk, if you add `#test`
+or `#docs` on a commit line in the file, that commit won't be counted against
+the budget here.
 
 ### Sharing a plan
 
 Once you're satisfied with your picks, send the plan as a plain-text email to
-the TBD mailing list and ask for feedback.  That way, people can reply directly
-to the individual commits inline.
+the team and ask for feedback.  That way, people can reply directly to the
+individual commits inline.
 
 The following command will output the `@@ start @@` hunk from the plan:
 
