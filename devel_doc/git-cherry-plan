@@ -5,56 +5,45 @@ DIR=$HOME/.$PROGRAM
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 FILE=$DIR/$BRANCH
 EDITOR=$(git config --default vim --get core.editor)
-
 UPSTREAM=master
 BASE=$(git merge-base HEAD $UPSTREAM)
-DELIM="--- >8 ---"
 ABBREV=10
-
 README="\
-# Cherry-pick $BRANCH..$UPSTREAM onto $BRANCH
+# Cherry-pick plan from $UPSTREAM onto $BRANCH
 # vim:syntax=gitrebase
 #
 # Commands:
 # pick <commit> = use commit
-# drop <commit> = remove commit, not suitable
+# drop <commit> = ignore commit, not appropriate
+#      <commit> = ignore commit, not reviewed
 # skip <commit> = ignore commit, already applied
-#      <commit> = ignore commit, needs review
 #
-# These lines MUST NOT be re-ordered or removed.
-#
-# Priorities (descending order):
-# 1) regression, crash and security fixes
-# 2) user visible breakage with no workarounds
-# 3) user visible breakage with major impact
-# 4) other major impact stuff (if budget allows)
-#
-# Budget: 30 commits
-# Lines containing #test or #docs do not count against the budget.
+# These lines MUST NOT be re-ordered or removed; they are executed from top to
+# bottom.
 "
 
 usage() {
     echo "\
-Usage: git $PROGRAM COMMAND [ARGS]
+Usage: git $PROGRAM <command> [<arg>...]
 
-Manage a persistent git rebase-like todo list to cherry-pick upstream commits
-onto a stable branch when making releases.
+Manage persistent rebase-like todo lists (\"plans\"), one per branch.
+Think of a plan as a \"branch index\" for staging your picks.
 
-The list (a \"plan\") contains all commits on $UPSTREAM since the branching
-point, with a help message at the top, and is stored in a per-branch file.
+Useful for handling complex rebases that may also need peer review, such as
+cherry-picking commits onto a stable branch.
 
 Commands:
-    init [BRANCH]       make new plan for current branch
-                        (or copy from existing BRANCH)
+    init [<upstream>]   make plan for current branch
+                        ($UPSTREAM if <upstream> is omitted)
     edit                open plan in editor
+    cp <branch>         copy plan from <branch>
     rm                  remove plan
     ls                  list all plans
-    pull                append new commits from $UPSTREAM
-    update              mark applied commits
+    pull [<upstream>]   append new upstream commits to plan
+                        ($UPSTREAM if <upstream> is omitted)
+    update              mark applied commits in plan
     apply               apply plan
-    start               mark commits above $DELIM with drop
-    format              print plan for e-mail review
-                        (only commits below $DELIM)
+    dump                print plan to stdout
     status              show plan status"
     exit 1
 }
@@ -73,83 +62,84 @@ ensure_not_exists() {
     fi
 }
 
-applied() {
-    local log=$(git log --format="%b" $BASE..)
+get_hash() {
+    sed 's/^.\{5\}//' | cut -d' ' -f1
+}
+
+get_applied() {
+    local log=$(git log --format="%b" $1..)
     echo "$log" | sed -n 's/^(cherry picked from commit \(.*\))/\1/p'
     echo "$log" | sed -n 's/^Backported from commit \(.*\)/\1/p'
 }
 
+get_base() {
+    git merge-base HEAD $1
+}
+
+get_last() {
+    sed '/^#/d; /^$/d' $FILE | tail -1 | get_hash
+}
+
 mark() {
-    sed -i "s/^skip /     /" $1
-    applied | while read line; do
-        sed -i "s/^.\{5\}\($(echo $line | cut -c -$ABBREV)\)/skip \1/" $1
+    sed -i "s/^skip /     /" $FILE
+    get_applied $1 | while read line; do
+        sed -i "s/^.\{5\}\($(echo $line | cut -c -$ABBREV)\)/skip \1/" $FILE
     done
 }
 
 log() {
-    git log --reverse --abbrev=$ABBREV --format="     %h %s" $1..$UPSTREAM
-}
-
-budget() {
-    sed -n 's/^# Budget: \(.*\) commits$/\1/p' $1
-}
-
-gethash() {
-    sed 's/^.\{5\}//' | cut -d' ' -f1
+    git log --reverse --abbrev=$ABBREV --format="$2 %h %s" $1..$UPSTREAM
 }
 
 CMD=$1
 shift
 if [ "$CMD" == "init" ]; then
     ensure_not_exists
+    base=$(get_base ${1:-$UPSTREAM})
     mkdir -p $DIR
-    if [ -z "$1" ]; then
-        echo "$README" > $FILE
-        log $BASE >> $FILE
-        mark $FILE
-    else
-        cp $DIR/$1 $FILE
-    fi
+    echo "$README" > $FILE
+    log $base "drop" >> $FILE
+    mark $base
 elif [ "$CMD" == "pull" ]; then
     ensure_exists
-    log $(tail -1 $FILE | gethash) | tee -a $FILE
+    log $(get_last) "    " | tee -a $FILE
 elif [ "$CMD" == "update" ]; then
     ensure_exists
-    mark $FILE
-elif [ "$CMD" == "start" ]; then
-    ensure_exists
-    sed -i "0,/^# $DELIM$/ s/^     /drop /" $FILE
+    mark $BASE
 elif [ "$CMD" == "edit" ]; then
     ensure_exists
     $EDITOR $FILE
+elif [ "$CMD" == "cp" ]; then
+    ensure_not_exists
+    cp $DIR/$1 $FILE
 elif [ "$CMD" == "rm" ]; then
     ensure_exists
     rm -i $FILE
 elif [ "$CMD" == "ls" ]; then
     ls -1 $DIR
-elif [ "$CMD" == "format" ]; then
-    ensure_exists
-    sed "/^[^#].*$/,$ d" $FILE
-    sed "0,/^# $DELIM$/ d" $FILE
 elif [ "$CMD" == "status" ]; then
     ensure_exists
-    last=$(tail -1 $FILE | gethash)
-    count=$(git rev-list --count $last..$UPSTREAM)
+    count=$(git rev-list --count $(get_last)..$UPSTREAM)
+    picked=$(grep '^pick ' $FILE | wc -l)
+    unmarked=$(grep '^     ' $FILE | wc -l)
     if [ "$count" == "0" ]; then
         echo "Your plan is up to date with '$UPSTREAM'."
     else
         echo "Your plan is behind '$UPSTREAM' by $count commits."
     fi
-    picked=$(grep '^pick ' $FILE | grep -v '#\(test\|docs\)' | wc -l)
-    unmarked=$(grep '^     ' $FILE | wc -l)
-    echo "$picked/$(budget $FILE) picked, $unmarked unmarked"
+    echo "$picked picked, $unmarked unmarked"
+elif [ "$CMD" == "dump" ]; then
+    ensure_exists
+    cat $FILE
 elif [ "$CMD" == "apply" ]; then
     ensure_exists
+
     grep '^pick ' $FILE | while read line; do
-        commit=$(echo "$line" | gethash)
+        commit=$(echo "$line" | get_hash)
         echo "Applying commit $commit"
         git cherry-pick -x $commit >/dev/null || exit 1
     done
+
     echo "Plan applied successfully!"
 else
     usage

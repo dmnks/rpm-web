@@ -54,7 +54,7 @@ one per stable branch, and a helper script.
 
 ### Initializing a plan
 
-To initialize a plan for a stable branch (e.g. rpm-4.15.x), run:
+First, generate a plan for a stable branch (e.g. rpm-4.15.x):
 
 ```
 $ git checkout <stable>
@@ -64,7 +64,7 @@ $ git cherry-plan init
 This will create a file `~/.cherry-plan/<stable>` with a chronological list of
 commits on master since the branching point, similar to that produced by `git
 rebase -i`, and mark with `skip` those that have been cherry-picked or
-backported already.
+backported already, with the rest being `drop`.
 
 To open the file in your default git editor (`core.editor` in `git-config(1)`)
 or VIM if unset, run:
@@ -115,12 +115,19 @@ yourself:
 If the answer to any of the above is "yes" then it's almost certainly not
 appropriate for a stable maintenance release.  Mark such a commit with `drop`.
 
+The general priorities for stable branches are (descending order):
+
+1. Regression, crash and security fixes
+2. User visible breakage with no workarounds
+3. User visible breakage with major impact
+4. Other major impact stuff (if [budget](#choosing-a-commit-budget) allows)
+
 #### Choosing a starting point
 
 You may want to skip any commits that were already reviewed in the last release
-(if any).  For a brand new plan, the last `skip` commit is a good indication of
-where the review stopped, but it's a good idea to look a bit further back, in
-case some otherwise suitable commits were omitted due to
+(if any).  For a newly initialized plan, the last `skip` commit is a good
+indication of where the review stopped, but it's a good idea to look a bit
+further back, in case some otherwise suitable commits were omitted due to
 [budget](#choosing-a-commit-budget) constraints and such.  In particular,
 regression or security updates (e.g. rpm-4.15.1.1) tend to include very
 specific cherry-picks, leaving gaps behind that may contain useful material for
@@ -129,14 +136,17 @@ the next stable release.
 Otherwise, when editing an existing plan, simply start at the first unmarked
 commit.
 
-Once you've chosen your starting point, insert (move) the `# --- >8 ---`
-comment above the respective commit.  This will act as a bookmark for you and
-for others when [asking](#sharing-a-plan) for feedback later.  In the case of a
-brand new plan, make sure to mark all commits above the separator with `drop`
-by running:
+Once you've chosen your starting point, mark it by inserting a delimiter line
+(e.g. `# -------- >8 --------`) above the respective commit.  This will act as
+a bookmark for you and for others when [asking](#sharing-a-plan) for feedback
+later.
+
+For a newly initialized plan, make sure to unmark all lines below the
+delimiter.  The easiest editor-agnostic way to do this is to remove them and
+then run:
 
 ```
-$ git cherry-plan start
+$ git cherry-plan pull
 ```
 
 #### Choosing a commit budget
@@ -149,18 +159,13 @@ Generally speaking, the budget is for code changes *only*, so any test and
 documentation additions or updates do *not* count and should always be picked
 if possible.
 
-You can check how you're doing in terms of budget spending by running:
+You can check the number of picks so far by running:
 
 ```
 $ git cherry-plan status
 Your plan is up to date with 'master'.
-12/30 picked, 54 unmarked
+12 picked, 54 unmarked
 ```
-
-The budget number is taken from the `Budget:` line at the top of the file and
-defaults to 30 for newly created plans.  As a little perk, if you add `#test`
-or `#docs` on a commit line in the file, that commit won't be counted against
-the budget here.
 
 #### VIM config
 
@@ -171,15 +176,16 @@ show` with the `Enter` key.
 ### Sharing a plan
 
 Once you're satisfied with your picks, send the plan as a plain-text email to
-the team and ask for feedback.  That way, people can reply directly to the
-individual commits inline.
-
-The following command will output the plan with only the commits below
-`# --- >8 ---`:
+the team and ask for feedback:
 
 ```
-$ git cherry-plan format > email.txt
+$ git cherry-plan dump > email.txt
 ```
+
+That way, people can reply directly to the individual commits inline.
+
+In the email, consider cutting off all commits above the delimiter to make it
+less verbose.
 
 Based on the feedback, make sure to update your local copy of the plan
 accordingly.
@@ -191,7 +197,7 @@ rpm-4.15.1) and copy the plan to it:
 
 ```
 $ git checkout -b <release>
-$ git cherry-plan init <stable>
+$ git cherry-plan cp <stable>
 ```
 
 Now, apply the plan:
