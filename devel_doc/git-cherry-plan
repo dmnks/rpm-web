@@ -5,7 +5,6 @@ CONFIG=cherryPlan
 HEAD=$(git rev-parse --abbrev-ref HEAD)
 ABBREV=$(git rev-parse --short HEAD | tr -d '\n' | wc -c)
 DIR=$(git config --get $CONFIG.directory); DIR=${DIR:+$DIR/}
-PATTERN="^(cherry picked from commit \(.*\))\$"
 README="\
 # Commands:
 # pick <commit> = use commit
@@ -91,12 +90,11 @@ abbrev() {
 }
 
 get_applied() {
-    local log=$(git rev-list --pretty="format:%b" $1..)
-    local patterns=$(git config --get-all $CONFIG.fromPatterns)
-    [ -z "$patterns" ] && patterns=$PATTERN
-    echo "$patterns" | while IFS= read -r line; do
-        echo "$log" | sed -n "s/$line/\1/p"
-    done
+    local pattern=$(git config --get $CONFIG.fromPatterns)
+    grep -f \
+        <(git rev-list $1.. | xargs git show | git patch-id | cut -d' ' -f1) \
+        <(git rev-list ..$1 | xargs git show | git patch-id) | cut -d' ' -f2
+    git rev-list --pretty="format:%b" $1.. | sed -n "s/$pattern/\1/p"
 }
 
 get_last() {
