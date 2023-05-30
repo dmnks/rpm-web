@@ -93,7 +93,7 @@ $ git config cherryPlan.portedRegex '^(backported from commit \(.*\))$'
 #### Grouping commits
 
 Commits often come as part of bigger logical changesets, represented by topic
-branches in the author's fork and then optionally recorded as merged commits in
+branches in the author's fork and then optionally recorded as merge commits in
 the git log.  This can help one to understand the big picture when looking at
 an individual commit.
 
