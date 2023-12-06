@@ -1,0 +1,38 @@
+#!/bin/bash
+
+set -e
+
+SOURCE_DIR=$1
+TARBALL=$2
+CHANGELOG_MD=$PWD/ChangeLog.md
+# TODAY=$(date +'%b %d %Y')
+
+pushd $SOURCE_DIR >/dev/null
+VERSION=$(basename $TARBALL | sed -n 's/^rpm-\(.\+\)\.tar\..\+$/\1/p')
+BRANCH="$(echo $VERSION | cut -d'.' -f1,2).x"
+CHECKSUM=$(sha256sum $TARBALL | cut -d' ' -f1)
+git changelog -mn -l2 rpm-4.19.0-release > $CHANGELOG_MD
+popd >/dev/null
+
+RELEASE_MD=wiki/Releases/${VERSION}.md
+cp skel/release.md $RELEASE_MD
+sed -i "s/VERSION/$VERSION/g; s/BRANCH/$BRANCH/g; \
+        s/CHECKSUM/$CHECKSUM/g" $RELEASE_MD
+cat $CHANGELOG_MD | sed -i '/^## Summary of changes/r /dev/stdin' $RELEASE_MD
+rm $CHANGELOG_MD
+git add $RELEASE_MD
+
+# cp skel/index.md $INDEX_MD
+# sed -i "s/X\.Y\.Z/$VERSION/g" $INDEX_MD
+# sed -i "s/MMM DD YYYY/$TODAY/g" $INDEX_MD
+# cat $INDEX_MD | sed -i '/^## News/r /dev/stdin' index.md
+# cat $INDEX_MD | sed -i '4r /dev/stdin' timeline.md
+# rm $INDEX_MD
+# git add index.md timeline.md
+
+# cp skel/download.md $DOWNLOAD_MD
+# sed -i "s/X\.Y\.Z/$VERSION/g" $DOWNLOAD_MD
+# sed -i "s/X\.Y/${MAJOR}/g" $DOWNLOAD_MD
+# cat $DOWNLOAD_MD | sed -i "/^### RPM ${MAJOR}.x/r /dev/stdin" download.md
+# rm $DOWNLOAD_MD
+# git add index.md timeline.md

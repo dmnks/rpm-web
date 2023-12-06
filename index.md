@@ -15,6 +15,11 @@ capable of
 * verifying integrity of packaged software and resulting software installation
 
 ## News
+#### RPM 4.19.1 released (Dec 06 2023)
+* This is a bug fix release with a few minor enhancements.
+* See [release notes](wiki/Releases/4.19.1) for details and download information
+* Highlights include:
+
 
 #### RPM 4.18.2 released (Nov 13 2023)
 * This is a bug fix release with a few minor enhancements.
