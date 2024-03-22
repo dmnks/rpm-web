@@ -65,7 +65,7 @@ class Release(object):
 
 class PlainLog(object):
     def __init__(self, range, empty, no_preamble, width, refresh, quiet,
-                 *args, **kwargs):
+                 summary_file, *args, **kwargs):
         self.range = range
         self.release = Release(range)
         self.empty = empty
@@ -73,7 +73,9 @@ class PlainLog(object):
         self.width = width
         self.refresh = refresh
         self.quiet = quiet
+        self.summary_file = summary_file
         self._changesets = ChangesetStore()
+        self._nums = dict()
 
     def _format_preamble(self):
         out = 'Changelog'
@@ -81,8 +83,8 @@ class PlainLog(object):
             return out
         return '{} {}'.format(self.release.name, out)
 
-    def _format_section(self, section):
-        return HEADINGS[section] + '\n'
+    def _format_section(self, title):
+        return title + '\n'
 
     def _format_changeset(self, chset):
         fmt = '  * {}{} {}(#{})'
@@ -94,6 +96,11 @@ class PlainLog(object):
         title = shorten(title.replace('`', ''),
                         self.width - len(fmt.format(prefix, '', postfix, num)))
         return fmt.format(prefix, title, postfix, num)
+
+    def _format_summary(self, summary):
+        title, nums = summary
+        nums = ', '.join(['#' + num for num in sorted(nums)])
+        return '  * {} ({})'.format(title, nums)
 
     @property
     def changesets(self):
@@ -150,6 +157,8 @@ class PlainLog(object):
                 d.setdefault(label, []).append(
                     (prefix, postfix, chset['title'], num, chset['url']))
 
+            self._nums[num] = chset['url']
+
         return d
 
     def __str__(self):
@@ -157,8 +166,23 @@ class PlainLog(object):
         if not self.no_preamble:
             out = [self._format_preamble(), '']
         changesets = self.changesets
+
+        # Generate summary (if any)
+        if (self.summary_file):
+            out.append(self._format_section('Summary'))
+            with open(self.summary_file) as f:
+                for line in f:
+                    nums, title = line.split(':', 1)
+                    nums = set(nums.split())
+                    title = title.strip()
+                    if not all(num in self._nums for num in nums):
+                        continue
+                    out.append(self._format_summary((title, nums)))
+            out.append('')
+
+        # Generate sections
         for section in SECTIONS:
-            heading = self._format_section(section)
+            heading = self._format_section(HEADINGS[section])
             if section not in changesets:
                 if self.empty:
                     out.append(heading)
@@ -167,15 +191,19 @@ class PlainLog(object):
             for chset in sorted(changesets[section], key=cmp_to_key(chset_cmp)):
                 out.append(self._format_changeset(chset))
             out.append('')
+
         return '\n'.join(out)
 
 
 class MarkdownLog(PlainLog):
-    def __init__(self, range, empty, no_preamble, width, refresh, quiet, level,
-                 *args, **kwargs):
+    def __init__(self, range, empty, no_preamble, width, refresh, quiet,
+                 summary_file, level, *args, **kwargs):
         super(MarkdownLog, self).__init__(
-            range, empty, no_preamble, width, refresh, quiet)
+            range, empty, no_preamble, width, refresh, quiet, summary_file)
         self.level = level - 1
+
+    def _link(self, title, url):
+        return '[#{}]({})'.format(title, url)
 
     def _heading(self, level, name):
         return '{} {}'.format('#' * (self.level + level), name)
@@ -183,8 +211,8 @@ class MarkdownLog(PlainLog):
     def _format_preamble(self):
         return self._heading(1, super(MarkdownLog, self)._format_preamble())
 
-    def _format_section(self, section):
-        return self._heading(2, HEADINGS[section])
+    def _format_section(self, title):
+        return self._heading(2, title)
 
     def _format_changeset(self, chset):
         prefix, postfix, title, num, url = chset
@@ -192,7 +220,13 @@ class MarkdownLog(PlainLog):
             prefix = '{}: '.format(HEADINGS[prefix])
         if postfix:
             postfix = '[{}] '.format(HEADINGS[postfix])
-        return '* {}{} {}([#{}]({}))'.format(prefix, title, postfix, num, url)
+        return '* {}{} {}({})'.format(prefix, title, postfix, self._link(num, url))
+
+    def _format_summary(self, summary):
+        title, nums = summary
+        nums = ', '.join([self._link(num, self._nums[num])
+                          for num in sorted(nums)])
+        return '* {} ({})'.format(title, nums)
 
 
 CONFIG = GitConfig('changelog')
@@ -211,6 +245,8 @@ parser = argparse.ArgumentParser(
 parser.add_argument('range', nargs='?', type=str, default=RELEASE.range,
                     help='git revision range (default: {})'.format(
                         RELEASE.range))
+parser.add_argument('-s', '--summary-file',
+                    help='file with changeset summary definitions')
 parser.add_argument('-e', '--empty', action='store_true',
                     help='include empty sections')
 parser.add_argument('-n', '--no-preamble', action='store_true',
@@ -236,5 +272,5 @@ else:
     Log = PlainLog
 
 log = Log(args.range, args.empty, args.no_preamble, args.width, args.refresh,
-          args.quiet, args.level)
+          args.quiet, args.summary_file, args.level)
 print(log)
