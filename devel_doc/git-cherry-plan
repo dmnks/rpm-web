@@ -380,7 +380,7 @@ class Plan(object):
 
         # Add the footer
         lines += [FOOTER.format(rev_parse(self.HEAD), rev_parse(self.head),
-                  rev_parse(self.HEAD), len(self.log))]
+                  rev_parse(self.HEAD), len(self.slice))]
 
         return '\n'.join(lines)
 
@@ -684,7 +684,7 @@ parser_update.set_defaults(verb=update)
 parser_status = subparsers.add_parser(
     'status', help='show current status of plan')
 parser_status.set_defaults(verb=status)
-parser_status.add_argument('-l', '--limit', type=int, default=20,
+parser_status.add_argument('-l', '--limit', type=int, default=3,
     help='maximum number of commits to show in each section, '
          '0 means no limit (default: 20)')
 
