@@ -26,6 +26,12 @@ conflicts, see if it's resolvable with a suitable upstream commit and if not,
 fix it manually and change the "(cherry picked from commit ...)" message into
 "(backported from commit ...)" to mark the difference.
 
+The rest of this guide primarily covers the creation of *stable* releases, that
+is, production releases cut from stable branches that are meant for general
+consumption.  Pre-releases (like alpha and beta) follow a similar process
+although there are a few differences which currently aren't specifically
+covered here.
+
 ## Selecting commits
 
 Crafting a stable release is inherently a manual process which starts by
@@ -295,116 +301,103 @@ your fork's `<release>` branch into the `<stable>` branch.
 * Review needs a different mindset than new code: look for compatibility and
   stability issues in particular, as per "Selecting commits" above
 
-Make sure the PR is merged before continuing below.
-
-## Must-have content
-
-The following items should be completed before proceeding to release cutting:
-
-1. All GitHub tickets set to the milestone `X.Y.Z` are completed.  You can
-   check that with the following search query: `is:issue is:open
-   milestone:X.Y.Z`.  If there are some left, make sure they're handled and
-   then go back as many steps as needed.
-
-1. Translations are up-to-date.  If they weren't recently updated, do that with
-   the below commands, then commit and push to master (use the commit message
-   "Update translation submodule for new translations") and finally cherry-pick
-   them onto the stable branch.
-
-    ```
-    git submodule update --init
-    cd po/
-    git pull origin master
-    ```
-
 ## Cutting a release
 
-In the following text, the `X.Y.Z` string denotes the version number that
-you're preparing, for example `4.19.1`.
+### Prerequisites
 
-1. Make a release commit:
+- The release PR is merged upstream.
 
-    1. Bump `VERSION` in `project()` in CMakeLists.txt
+- All tickets with the corresponding release milestone on GitHub are closed.
 
-    1. Bump `RPM_SOVERSION` and `RPM_LIBVERSION` in CMakeLists.txt:
+- The upstream [rpm](https://github.com/rpm-software-management/rpm/) and
+  [web](https://github.com/rpm-software-management/rpm-web) repos are cloned
+  locally (referred to as *rpm repo* and *website repo* in the below text,
+  respectively).
 
-        * Consult the associated comment block in CMakeLists.txt for
-          instructions.
-        * soname bumps can only occur at the first version of a new branch
-          (i.e. alpha/beta).
+- The git remotes referring to the upstream repos in both clones are called
+  `upstream`.
 
-    1. Update the output of "pinned" tests: `make pinned`
+- The placeholder `X.Y.Z` in the below text is replaced with the release being
+  created, e.g. `4.19.1`.
 
-    1. Commit the changes from the previous step with something like "Preparing
-       for X.Y.Z" as the message
+### Process
 
-1. Tag the release:
+1. Tag the new release
 
-    `git tag -am "RPM X.Y.Z release" rpm-X.Y.Z-release`
+    1. Open the top-level `CMakeLists.txt` file in the rpm repo for editing.
 
-1. Push the tag.  This is the point of no return for a given release:
+    2. Bump the project's `VERSION` argument to the new release number:
 
-    `git push rpm-X.Y.Z-release`
+        `project(rpm VERSION X.Y.Z ...)`
 
-1. Compile release notes (see `git changelog -h` for more details):
+    3. Bump the `RPM_SOVERSION` and `RPM_LIBVERSION` variables (see the comment
+       block above them for instructions).  Note that soname bumps must *not*
+       occur in stable releases.
 
-    `git changelog -m > changelog.md`
+    4. Update the output of "pinned" tests:
 
-1. Publish the release:
+        `make pinned`
 
-    1. Create a draft release on GitHub for the new tag:
+    5. Commit the changes with the subject line `Preparing for X.Y.Z`.
+
+    6. Tag the release:
+
+        `git tag -am "RPM X.Y.Z release" rpm-X.Y.Z-release`
+
+2. TODO: Prepare the Release Notes
+
+    1. Make a copy of the previous RN in `wiki/Releases/` in the website repo.
+    2. Substitute the respective version numbers and links as needed.
+
+3. Publish the release
+
+    1. Push the tag:
+
+        `git push upstream rpm-X.Y.Z-release`
+
+    2. Create a draft release on GitHub for the new tag:
 
         `gh release create --draft --title "RPM X.Y.Z" --notes-file changelog.md rpm-X.Y.Z-release`
 
-    1. View the draft in your browser (see the link printed by the command)
-    1. Verify that the draft looks fine, make any adjustments if necessary
-    1. Tick the "Create a discussion for this release" checkbox
-    1. Click the Publish button to make the release available
-    1. Verify that the release gets a tar.bz2 and CHECKSUM file attached under
-       "Assets" after a few minutes.  This is done by a GitHub Actions workflow
-       named "Release artifacts" that automatically runs when a new release is
-       published.
+    3. View the draft in a web browser (see the printed link).
 
-1. Upload the tarball to [rpm.org](https://rpm.org/):
+    4. Verify that the draft looks fine, drop the top-level markdown heading
+       and add a short summary of the release to the top (see previous releases
+       for inspiration).
 
-    1. Download the tar.bz2 and CHECKSUM files from the new release to your
-       current directory
-    1. Verify the tarball's checksum:
+    5. Tick the **Create a discussion for this release** checkbox.
 
-       `sha512sum -c CHECKSUM`
+    6. Click **Publish** to make the release available.
 
-    1. `scp` the tarball to `rpm@ftp-osl.osuosl.org` into the appropriate
-       per-branch directory in `~/ftp/releases/`
-    1. Run the `./trigger-rpm` script in the home directory to start mirror
-       process
+    7. Verify that the release gets a `rpm-X.Y.Z.tar.bz2` and `CHECKSUM` file
+       attached under **Assets** after a few minutes.  This is done by a GitHub
+       Actions workflow named "Release artifacts" that automatically runs when
+       a new release is published.
 
-1. Update the homepage at [rpm.org](https://rpm.org/):
-    1. Clone the [rpm-web](https://github.com/rpm-software-management/rpm-web)
-       repository (if not cloned yet) and enter it
-    1. Make a copy of the `wiki/Releases/skeleton.md` file and name it
-       `wiki/Releases/X.Y.Z.md`
-    1. Fill in the blanks, use the contents of `changelog.md` for the "Summary
-       of changes" section
-    1. Add an entry to the `index.md` file announcing the release (see the
-       existing entries for inspiration), copy the Highlights section from
-       `changelog.md`
-    1. Copy the entry into the `timeline.md` file
-    1. Add an entry to the `download.md` file
-    1. Commit the whole lot with a commit message such as "Release X.Y.Z"
-    1. Push the above commit to the remote (this will automatically regenerate
-       the pages)
+    8. Download both files from the previous step to your current directory.
 
-1. Send out an announcement mail:
+    9. Verify the tarball's checksum:
 
-    ```
-    To: rpm-announce@lists.rpm.org, rpm-maint@lists.rpm.org, rpm-list@lists.rpm.org
-    Subject: RPM X.Y.Z released!
+        `sha512sum -c CHECKSUM`
 
-    [some intro followed by the output of "git changelog"]
+    10. Upload the tarball to the official FTP server:
 
-    For a complete list of changes, visit:
+        `scp rpm-X.Y.Z.tar.bz2 rpm@ftp-osl.osuosl.org:~/ftp/releases/rpm-X.Y.x/`
 
-        https://rpm.org/wiki/Releases/X.Y.Z
-    ```
+    11. Start the mirroring process:
 
-1. Party!
+        `ssh rpm@ftp-osl.osuosl.org ./trigger-rpm`
+
+    12. TODO: Add Downloads section
+
+    13. TODO: Push the commit in the website repo:
+
+        `git push upstream master`
+
+4. Send out an announcement mail to `rpm-announce@lists.rpm.org`,
+   `rpm-maint@lists.rpm.org` and `rpm-list@lists.rpm.org` with the subject line
+   `RPM X.Y.Z released!`. See past
+   [announcements](https://lists.rpm.org/pipermail/rpm-announce/) for
+   inspiration on the writing style.
+
+5. Party!

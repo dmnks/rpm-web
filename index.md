@@ -16,6 +16,16 @@ capable of
 
 ## News
 
+{% for release in site.releases %}
+#### RPM {{ release.version }} released ({{ release.stamp }})
+* {{ release.summary.title }}
+* See [release notes](wiki/Releases/{{ release.version }}) for details and download information
+* Highlights include:
+{% for item in release.summary.highlights -%}
+    * {{ item }}
+{% endfor %}
+{% endfor %}
+
 #### RPM 4.20.1 released (Feb 19 2025)
 * This is primarily a bugfix release addressing a handful of regressions in RPM 4.20.0 as well as various other issues.
 * See [release notes](wiki/Releases/4.20.1) for details and download information

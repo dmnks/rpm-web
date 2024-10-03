@@ -18,12 +18,24 @@ function! s:hash()
 endfunction
 
 function! s:gitshow()
-    let l:hash = s:hash()
-    if empty(l:hash)
-        return
+    let l:id = s:hash()
+    let l:cmd = "tig show "
+
+    if empty(l:id)
+        let l:line = getline('.')
+        if l:line[0:5] == '# PR #'
+            let l:id = split(l:line[6:], ':')[0]
+            let l:cmd = "gh issue view --comments "
+        else
+            return
+        endif
     endif
-    silent exec "!git show --stat -p --color " . s:hash() . " | less -cR" |
-    \   redraw!
+
+    call system("tmux has-session -t:.2 2>/dev/null")
+    if v:shell_error != 0
+        call system("tmux split-window -h")
+    endif
+    call system("tmux respawn-pane -e PAGER='less -+F' -k -t2 -- " . l:cmd . l:id)
 endfunction
 
 function! s:propen()
@@ -62,10 +74,11 @@ function! s:plancheck()
 endfunction
 
 function! s:init()
-    nmap <buffer> <silent> <NUL>        :call <sid>cycle()<CR>
+    nmap <buffer> <silent> <C-space>    :call <sid>cycle()<CR>
     nmap <buffer> <silent> <CR>         :call <sid>gitshow()<CR>
     nmap <buffer> <silent> gx           :call <sid>propen()<CR>
     nmap <buffer> <silent> <F8>         :call <sid>plancheck()<CR>
+    hi! def link gitrebaseNoop Constant
 endfunction
 
 autocmd BufNewFile,BufRead *.plan call <sid>init()
