@@ -10,31 +10,31 @@
 [changelog]
 	# Loosely based on https://keepachangelog.com/en/1.1.0/
 	sections = highlight,rfe,changed,deprecated,removed,bug,security,other
-	prefixes = cli,transaction,packaging,macros,generator,lua,python,build,plugins
-	postfixes = regression,cosmetic,optimization
+	prefixes = regression,cli,transaction,packaging,generator,lua,python,plugins,build,config,manpage
+	postfixes = cosmetic,optimization
 	ignore = cleanup,test,documentation
 	releasePattern = ^(RPM .*) release$
 [changelog "headings"]
 	bug = Fixes
-	build = Build
+	build = Building
 	changed = Changes
-	cli = Command line
+	cli = Command-Line
+	config = Config
 	cosmetic = Cosmetic
 	deprecated = Deprecations
 	generator = Generators
 	highlight = Highlights
-	lua = Lua interface
-	macros = Macros
+	lua = Lua
+	manpage = Manuals
 	optimization = Optimization
 	other = Other
 	packaging = Packaging
 	plugins = Plugins
-	python = Python bindings
+	python = Python
 	regression = Regression
 	removed = Removals
 	rfe = Enhancements
 	security = Security
-	transaction = Transaction
+	transaction = Transactions
 [changelog "aliases"]
-	crypto = security
 	regression = bug
