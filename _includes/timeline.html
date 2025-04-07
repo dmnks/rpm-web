@@ -1,0 +1,37 @@
+{% assign support = site.data.support | map: "series" %}
+{% assign posts = site.notices | concat: site.releases |
+    sort: "date" | reverse %}
+
+{% for post in posts limit:page.max_posts %}
+{% if post.collection == "releases" %}
+{% assign release = post %}
+{% if release.draft %}
+{% continue %}
+{% endif %}
+{% if support contains release.series or page.name == "timeline.html" %}
+<h4>{{ release.title }} released ({{ release.date | date: "%b %d %Y" }})</h4>
+<ul>
+{% if release.summary %}
+    <li>{{ release.summary }}</li>
+{% endif %}
+    <li>See
+{% if release.prerelease %}
+    <a href="releases/{{ release.version }}">draft release notes</a>
+{% else %}
+    <a href="releases/{{ release.slug }}">release notes</a>
+{% endif %}
+    for details and download information.</li>
+{% assign excerpt = release.excerpt | strip_newlines %}
+{% if excerpt != "" %}
+    <li>Highlights include:
+        {{ release.excerpt }}
+    </li>
+{% endif %}
+</ul>
+{% endif %}
+{% else %}
+{% assign notice = post %}
+<h4>{{ notice.title }} ({{ notice.date | date: "%b %d %Y" }})</h4>
+{{ notice.content }}
+{% endif %}
+{% endfor %}
