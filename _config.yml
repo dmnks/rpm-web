@@ -1,1 +1,4 @@
-baseurl: 
+collections:
+  notices:
+  releases:
+    output: true

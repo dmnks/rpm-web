@@ -1,0 +1,37 @@
+---
+layout: default
+---
+
+{% assign snapshot = site.releases |
+    where: "version", page.version | where: "draft", false |
+    sort: "date" | last %}
+{% assign title = snapshot.title |
+    default: page.title | append: " Release Notes" %}
+{% assign tarball = snapshot.tarball %}
+{% assign checksum = snapshot.checksum %}
+{% assign filename = tarball | split: "/" | slice: -1, 1 %}
+
+{% if page.draft %}
+{% assign title = title | append: " (DRAFT)" %}
+{% endif %}
+
+<h1>{{ title }}</h1>
+
+{% if page.draft %}
+<p><b>Last change:</b> {{ "now" | date: "%b %d %Y" }}</p>
+{% endif %}
+
+<h3>Downloads</h3>
+<ul>
+{% if tarball %}
+    <li>Source: <a href="{{ tarball }}">{{ filename }}</a></li>
+    <li>SHA256SUM: {{ checksum }}</li>
+{% else %}
+    <li>Source: N/A</li>
+    <li>SHA256SUM: N/A</li>
+{% endif %}
+</ul>
+
+<h3>Changes since {{ page.since }}</h3>
+<h4>Overview</h4>
+{{ page.content }}

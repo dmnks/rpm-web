@@ -1,0 +1,7 @@
+# Supported stable releases
+
+- series: 4.20.x
+  title: RPM 4.20.x
+
+- series: 4.19.x
+  title: RPM 4.19.x

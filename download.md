@@ -4,17 +4,35 @@ title: rpm.org - Download
 ---
 
 ## Current stable releases (supported)
-### RPM 4.20.x
-* [RPM 4.20.1](https://ftp.osuosl.org/pub/rpm/releases/rpm-4.20.x/rpm-4.20.1.tar.bz2) ([Release notes](wiki/Releases/4.20.1.html))
-* [RPM 4.20.0](https://ftp.osuosl.org/pub/rpm/releases/rpm-4.20.x/rpm-4.20.0.tar.bz2) ([Release notes](wiki/Releases/4.20.0.html))
-
-### RPM 4.19.x
-* [RPM 4.19.1.1](https://ftp.osuosl.org/pub/rpm/releases/rpm-4.19.x/rpm-4.19.1.1.tar.bz2) ([Release notes](wiki/Releases/4.19.1.1.html))
-* [RPM 4.19.1](https://ftp.osuosl.org/pub/rpm/releases/rpm-4.19.x/rpm-4.19.1.tar.bz2) ([Release notes](wiki/Releases/4.19.1.html))
-* [RPM 4.19.0](https://ftp.osuosl.org/pub/rpm/releases/rpm-4.19.x/rpm-4.19.0.tar.bz2) ([Release notes](wiki/Releases/4.19.0.html))
+{% for support in site.data.support %}
+### {{ support.title }}
+{% assign releases = site.releases |
+    where: "series", support.series | where: "prerelease", false |
+    where: "draft", false | sort: "date" | reverse %}
+{% for release in releases -%}
+* [{{ release.title }}]({{ release.tarball }})
+  ([Release notes](releases/{{ release.slug }}))
+{% endfor %}
+{% if releases == empty %}
+* N/A
+{% endif %}
+{% endfor %}
 
 ## Current test releases
+{% assign found = false %}
+{% for support in site.data.support %}
+{% assign release = site.releases |
+    where: "series", support.series | where: "draft", false |
+    sort: "date" | last %}
+{% if release.prerelease == true -%}
+{% assign found = true -%}
+* [{{ release.title }}]({{ release.tarball }})
+  ([Release notes](releases/{{ release.version }}))
+{% endif %}
+{% endfor %}
+{% if found == false %}
 * N/A
+{% endif %}
 
 ## Old releases (no longer supported)
 
