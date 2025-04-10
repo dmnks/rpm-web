@@ -7,7 +7,7 @@ title: rpm.org - Download
 {% for support in site.data.support %}
 ### {{ support.title }}
 {% assign releases = site.releases |
-    where: "series", support.series | where: "prerelease", false |
+    where: "series", support.series | where: "snapshot", false |
     where: "draft", false | sort: "date" | reverse %}
 {% for release in releases -%}
 * [{{ release.title }}]({{ release.tarball }})
@@ -24,7 +24,7 @@ title: rpm.org - Download
 {% assign release = site.releases |
     where: "series", support.series | where: "draft", false |
     sort: "date" | last %}
-{% if release.prerelease == true -%}
+{% if release.snapshot -%}
 {% assign found = true -%}
 * [{{ release.title }}]({{ release.tarball }})
   ([Release notes](releases/{{ release.version }}))
