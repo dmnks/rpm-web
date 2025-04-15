@@ -29,6 +29,16 @@ layout: default
 {% endif %}
 </p>
 
+{% if page.summary %}
+    {% if page.annolink %}
+        <p>{{ page.summary }}
+        (<a href="{{ page.annolink }}">announcement</a>).
+        </p>
+    {% else %}
+        <p>{{ page.summary }}.</p>
+    {% endif %}
+{% endif %}
+
 <h3>Downloads</h3>
 <ul>
 {% if tarball %}
