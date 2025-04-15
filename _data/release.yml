@@ -1,0 +1,25 @@
+# ----------------
+# Release metadata
+# ----------------
+
+# Tarball
+tarball:
+  baseurl: https://ftp.osuosl.org/pub/rpm/releases
+  fileext: tar.bz2
+
+# Tickets
+ticket:
+  baseurl: https://github.com/rpm-software-management/rpm/issues
+
+# Man pages
+manual:
+  baseurl: https://rpm-software-management.github.io/rpm/man
+
+# Supported series
+stable:
+- series: 6.0.x
+  title: RPM 6.0.x
+- series: 4.20.x
+  title: RPM 4.20.x
+- series: 4.19.x
+  title: RPM 4.19.x
