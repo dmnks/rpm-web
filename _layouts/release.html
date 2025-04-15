@@ -18,6 +18,14 @@ layout: default
 
 <h1>{{ title }}</h1>
 
+<p>
+{% if page.draft %}
+    <b>Last change:</b> {{ page.date | date: "%Y-%m-%d" }}
+{% else %}
+    <b>{{ latest.date | date: "%B %d, %Y" }}</b>
+{% endif %}
+</p>
+
 <h3>Downloads</h3>
 <ul>
 {% if tarball %}
