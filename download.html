@@ -1,0 +1,59 @@
+---
+layout: default
+title: rpm.org - Download
+---
+
+<h2>Current stable releases (supported)</h2>
+{% assign found = false %}
+{% for stable in site.data.release['stable'] %}
+    {% assign releases = site.releases |
+        where: "series", stable.series |
+        where: "snapshot", false |
+        where: "draft", false |
+        sort: "date" | reverse %}
+    {% if releases == empty %} {% continue %} {% endif %}
+    {% assign found = true %}
+    <h3>{{ stable.title }}</h3>
+    <ul>
+    {% for release in releases %}
+        <li><a href="{{ release.tarball }}">{{ release.title }}</a>
+            (<a href="releases/{{ release.slug }}">Release notes</a>)
+        </li>
+    {% endfor %}
+    </ul>
+{% endfor %}
+{% if found == false %}
+    <ul>
+        <li>N/A</li>
+    </ul>
+{% endif %}
+
+<h2>Current test releases</h2>
+<ul>
+{% assign found = false %}
+{% for stable in site.data.release['stable'] %}
+    {% assign release = site.releases |
+        where: "series", stable.series |
+        where: "draft", false |
+        sort: "date" | last %}
+    {% if release.snapshot == false %} {% continue %} {% endif %}
+    {% assign found = true %}
+    <li><a href="{{ release.tarball }}">{{ release.title }}</a>
+        (<a href="releases/{{ release.version }}">Release notes</a>)
+    </li>
+{% endfor %}
+{% if found == false %}
+    <li>N/A</li>
+{% endif %}
+</ul>
+
+<h2>Old releases (no longer supported)</h2>
+
+<p>For older releases, head over to <a href="timeline.html">RPM timeline.</a></p>
+
+<h3>POPT</h3>
+<ul>
+    <li><a href="https://ftp.osuosl.org/pub/rpm/popt/releases/popt-1.x/popt-1.19.tar.gz">POPT 1.19</a>
+        (<a href="https://github.com/rpm-software-management/popt/releases/tag/popt-1.19-release">Release notes</a>)
+    </li>
+</ul>

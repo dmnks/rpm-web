@@ -1,0 +1,38 @@
+{% assign series = site.data.release['stable'] | map: "series" %}
+{% assign posts = site.notices | concat: site.releases |
+    sort: "date" | reverse %}
+
+{% for post in posts limit:page.max_posts %}
+    {% case post.collection %}
+    {% when "releases" %}
+        {% assign release = post %}
+        {% if release.draft %} {% continue %} {% endif %}
+        {% if series contains release.series or page.max_posts == nil %}
+        {% else %}
+        {% continue %}
+        {% endif %}
+        <h4>{{ release.title }} released! ({{ release.date | date: "%b %d %Y" }})</h4>
+        <ul>
+        {% if release.summary %}
+            <li>{{ release.summary }}.</li>
+        {% endif %}
+            <li>See
+        {% if release.snapshot %}
+            <a href="releases/{{ release.version }}">draft release notes</a>
+        {% else %}
+            <a href="releases/{{ release.slug }}">release notes</a>
+        {% endif %}
+            for details and download information.</li>
+        {% assign excerpt = release.excerpt | strip_newlines %}
+        {% if release.overview %}
+            <li>Highlights include:
+                {{ release.excerpt }}
+            </li>
+        {% endif %}
+        </ul>
+    {% when "notices" %}
+        {% assign notice = post %}
+        <h4>{{ notice.title }} ({{ notice.date | date: "%b %d %Y" }})</h4>
+        {{ notice.content }}
+    {% endcase %}
+{% endfor %}
