@@ -1,1 +1,13 @@
-baseurl: 
+defaults:
+  - scope:
+      path: ""
+      type: "releases"
+    values:
+      layout: release
+      overview: true
+      snapshot: false
+      draft: false
+
+collections:
+  releases:
+    output: true

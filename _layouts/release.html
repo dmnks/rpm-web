@@ -1,0 +1,39 @@
+---
+layout: default
+---
+
+{% if page.draft %}
+    {% assign snap = site.releases |
+        where: "version", page.version |
+        where: "draft", false |
+        sort: "date" | last | default: page %}
+{% else %}
+    {% assign snap = page %}
+{% endif %}
+
+{% assign title = snap.title | append: " Release Notes" %}
+{% if page.draft %}
+    {% assign title = title | append: " (DRAFT)" %}
+{% endif %}
+{% assign tarball = snap.tarball %}
+{% assign checksum = snap.checksum %}
+{% assign filename = tarball | split: "/" | slice: -1, 1 %}
+
+<h1>{{ title }}</h1>
+
+<h3>Downloads</h3>
+<ul>
+{% if tarball %}
+    <li>Source: <a href="{{ tarball }}">{{ filename }}</a></li>
+    <li>SHA256SUM: {{ checksum }}</li>
+{% else %}
+    <li>Source: N/A</li>
+    <li>SHA256SUM: N/A</li>
+{% endif %}
+</ul>
+
+<h3>Changes since {{ page.since }}</h3>
+{% if page.overview %}
+    <h4>Overview</h4>
+{% endif %}
+{{ page.content }}

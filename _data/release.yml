@@ -1,0 +1,12 @@
+# Supported release series
+stable:
+- series: 6.0.x
+  title: RPM 6.0.x
+- series: 4.20.x
+  title: RPM 4.20.x
+- series: 4.19.x
+  title: RPM 4.19.x
+
+tarball:
+  baseurl: https://ftp.osuosl.org/pub/rpm/releases
+  fileext: tar.bz2
