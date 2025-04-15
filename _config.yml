@@ -5,6 +5,8 @@ defaults:
     values:
       layout: release
       overview: true
+      snapshot: false
+      draft: false
 collections:
   notices:
   releases:
