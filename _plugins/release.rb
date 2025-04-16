@@ -42,14 +42,17 @@ module Releases
 
         # Convert ticket references to links
         baseurl = site_data['ticket']['baseurl']
+        pattern = site_data['ticket']['pattern']
         page.content = page.content.gsub(
-          /\(#([0-9]+)\)/, '([#\1]('"#{baseurl}"'/\1))')
+          /#{pattern}/, '([#\1]('"#{baseurl}"'/\1))')
+        # Strip them from excerpt, though
+        data['excerpt'] = data['excerpt'].to_s.gsub(/#{pattern}/, '')
 
         # Convert man page references to links
         baseurl = site_data['manual']['baseurl']
+        pattern = site_data['manual']['pattern']
         page.content = page.content.gsub(
-          /\*(rpm[-\.[:alnum:]]*|gendiff)\*\(([1-8])\)/,
-          '[\1(\2)]('"#{baseurl}"'/\1.\2)')
+          /#{pattern}/, '[\1(\2)]('"#{baseurl}"'/\1.\2)')
       end
     end
   end
