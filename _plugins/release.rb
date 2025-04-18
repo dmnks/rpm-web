@@ -45,14 +45,14 @@ module Releases
         pattern = site_data['ticket']['pattern']
         page.content = page.content.gsub(
           /#{pattern}/, '([#\1]('"#{baseurl}"'/\1))')
-        # Strip them from excerpt, though
-        data['excerpt'] = data['excerpt'].to_s.gsub(/#{pattern}/, '')
 
         # Convert man page references to links
         baseurl = site_data['manual']['baseurl']
         pattern = site_data['manual']['pattern']
         page.content = page.content.gsub(
           /#{pattern}/, '[\1(\2)]('"#{baseurl}"'/\1.\2)')
+
+        data['excerpt'] = Jekyll::Excerpt.new(page)
       end
     end
   end
