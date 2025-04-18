@@ -8,6 +8,5 @@ defaults:
       snapshot: false
       draft: false
 collections:
-  notices:
   releases:
     output: true
