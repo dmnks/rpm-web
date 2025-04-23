@@ -41,6 +41,14 @@ module Releases
         if not data['draft'] then
           data['tarball'] = tarball
         end
+
+        # Convert man page references to links
+        baseurl = site_data['manual']['baseurl']
+        pattern = site_data['manual']['pattern']
+        page.content = page.content.gsub(
+          /#{pattern}/, '[\1(\2)]('"#{baseurl}"'/\1.\2)')
+
+        data['excerpt'] = Jekyll::Excerpt.new(page)
       end
     end
   end
