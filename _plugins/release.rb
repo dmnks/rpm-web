@@ -48,6 +48,12 @@ module Releases
         page.content = page.content.gsub(
           /#{pattern}/, '[\1(\2)]('"#{baseurl}"'/\1.\2)')
 
+        # Convert ticket references to links
+        baseurl = site_data['ticket']['baseurl']
+        pattern = site_data['ticket']['pattern']
+        page.content = page.content.gsub(
+          /#{pattern}/, '([#\1]('"#{baseurl}"'/\1))')
+
         data['excerpt'] = Jekyll::Excerpt.new(page)
       end
     end
