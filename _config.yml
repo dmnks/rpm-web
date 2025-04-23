@@ -9,6 +9,7 @@ defaults:
       overview: true
       snapshot: false
       draft: false
+      man_link: true
 
 collections:
   releases:
