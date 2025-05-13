@@ -8,33 +8,23 @@
 [cherryPlan "automark"]
 	pick = test,documentation,build
 [changelog]
-	# Loosely based on https://keepachangelog.com/en/1.1.0/
-	sections = highlight,rfe,changed,deprecated,removed,bug,security,other
-	prefixes = cli,transaction,packaging,macros,generator,lua,python,build,plugins
-	postfixes = regression,cosmetic,optimization
+	sections = general,packaging,internal
+	prefixes = regression
+	postfixes = cosmetic,optimization
 	ignore = cleanup,test,documentation
 	releasePattern = ^(RPM .*) release$
 [changelog "headings"]
-	bug = Fixes
-	build = Build
-	changed = Changes
-	cli = Command line
-	cosmetic = Cosmetic
-	deprecated = Deprecations
-	generator = Generators
-	highlight = Highlights
-	lua = Lua interface
-	macros = Macros
-	optimization = Optimization
-	other = Other
-	packaging = Packaging
-	plugins = Plugins
-	python = Python bindings
+	general = User Interface & Transactions
+	packaging = Spec & Package Building
+	internal = Distribution & Internals
 	regression = Regression
-	removed = Removals
-	rfe = Enhancements
-	security = Security
-	transaction = Transaction
+        other = Other
 [changelog "aliases"]
-	crypto = security
-	regression = bug
+	transaction = general
+	plugins = general
+	config = general
+	manpage = general
+	cli = general
+	lua = api
+	python = api
+	build = internal
