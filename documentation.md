@@ -6,7 +6,9 @@ title: rpm.org - Documentation
 This page attempts to track the various relevant documentation that exists for RPM.
 
 ## General Use
-* [RPM Reference Manual](doc/master/)
+* RPM Reference Manual
+  * [RPM 4.20.x](doc/4.20.x/)
+  * [RPM 4.19.x](doc/4.19.x/)
 * [RPM man pages](https://rpm-software-management.github.io/rpm/man/)
 * [Fedora News RPM Tutorial](http://fedoranews.org/alex/tutorial/rpm/)
 * [Fedora RPM Guide](https://web.archive.org/web/20170608211215/https://docs.fedoraproject.org/en-US/Fedora_Draft_Documentation/0.1/html/RPM_Guide/index.html)
@@ -22,7 +24,6 @@ This page attempts to track the various relevant documentation that exists for R
 * API documentation
   * [RPM 4.20.x](https://ftp.osuosl.org/pub/rpm/api/4.20.0/)
   * [RPM 4.19.x](https://ftp.osuosl.org/pub/rpm/api/4.19.0/)
-  * [RPM 4.18.x](https://ftp.osuosl.org/pub/rpm/api/4.18.0/)
   * [Older versions](https://ftp.osuosl.org/pub/rpm/api/)
 
 * [Programming RPM with C](https://web.archive.org/web/20170608211215/docs.fedoraproject.org/en-US/Fedora_Draft_Documentation/0.1/html//RPM_Guide/ch-programming-c.html) from Fedora RPM Guide
