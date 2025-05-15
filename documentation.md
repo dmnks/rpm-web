@@ -7,6 +7,7 @@ This page attempts to track the various relevant documentation that exists for R
 
 ## General Use
 * RPM Reference Manual
+  * [git-master](doc/master/)
   * [RPM 4.20.x](doc/4.20.x/)
   * [RPM 4.19.x](doc/4.19.x/)
 * [RPM man pages](https://rpm-software-management.github.io/rpm/man/)

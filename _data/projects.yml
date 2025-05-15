@@ -15,3 +15,6 @@
   ticket:
     baseurl: https://github.com/rpm-software-management/rpm/issues
     pattern: '\(#([0-9]+)\)'
+  docs:
+    - path: docs/manual/*.md
+      type: guide
