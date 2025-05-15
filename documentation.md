@@ -6,7 +6,7 @@ title: rpm.org - Documentation
 This page attempts to track the various relevant documentation that exists for RPM.
 
 ## General Use
-* [RPM Reference Manual](https://rpm-software-management.github.io/rpm/manual/)
+* [RPM Reference Manual](doc/master/)
 * [RPM man pages](https://rpm-software-management.github.io/rpm/man/)
 * [Fedora News RPM Tutorial](http://fedoranews.org/alex/tutorial/rpm/)
 * [Fedora RPM Guide](https://web.archive.org/web/20170608211215/https://docs.fedoraproject.org/en-US/Fedora_Draft_Documentation/0.1/html/RPM_Guide/index.html)
