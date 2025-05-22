@@ -29,9 +29,8 @@ build() {
     add_worktree $1
     mkdir -p $dest
 
-    if [ $make == true ]; then
-        cmake -B ${tree}/_build -S $tree
-        make -C ${tree}/_build pages
+    if [ "$make" != "null" ]; then
+        sh -c "cd $tree && $make"
     fi
 
     for path in $paths; do

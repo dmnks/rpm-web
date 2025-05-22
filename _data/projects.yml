@@ -18,14 +18,15 @@
   docs:
     - series: 6.0.x
       draft: true
-      make: true
+      make: |
+        cmake -B _build &&
+        make -C _build pages
       root: _build/site
       paths:
         - index.md
         - manual
     - series: 4.20.x
       draft: false
-      make: false
       root: docs
       paths:
         - index.md
@@ -33,7 +34,6 @@
         - man
     - series: 4.19.x
       draft: false
-      make: false
       root: docs
       paths:
         - index.md
