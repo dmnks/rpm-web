@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Build & merge rpm docs for each stable version series
+# Build RPM docs for each configured version series
 
 PROJECT=rpm
 REPO_URL=https://github.com/rpm-software-management/rpm
@@ -23,7 +23,6 @@ build() {
 
     local base=".docs.[] | select(.series == \"$2\")"
     local make=$(get_data "${base}.make")
-    local root=$(get_data "${base}.root")
     local paths=$(get_data "${base}.paths")
 
     add_worktree $1
@@ -34,7 +33,7 @@ build() {
     fi
 
     for path in $paths; do
-        cp -r ${tree}/${root}/${path} ${dest}/
+        cp -r ${tree}/${path} ${dest}/
     done
 }
 

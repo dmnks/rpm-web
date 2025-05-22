@@ -16,26 +16,29 @@
     baseurl: https://github.com/rpm-software-management/rpm/issues
     pattern: '\(#([0-9]+)\)'
   docs:
+    # TODO:
+    # - generate docs index
+    # - fix master & stable branches (html -> api, index.md, _man on master)
     - series: 6.0.x
       draft: true
-      make: |
-        cmake -B _build &&
-        make -C _build pages
-      root: _build/site
+      make: cmake -B _build -DWITH_DOXYGEN=ON && make -C _build pages apidoc
       paths:
-        - index.md
-        - manual
+        - _build/site/index.md
+        - _build/site/manual
+        - _build/docs/html
     - series: 4.20.x
       draft: false
-      root: docs
+      make: cmake -B _build -DWITH_DOXYGEN=ON && make -C _build apidoc
       paths:
-        - index.md
-        - manual
-        - man
+        - _build/docs/html
+        - docs/index.md
+        - docs/manual
+        - docs/man
     - series: 4.19.x
       draft: false
-      root: docs
+      make: cmake -B _build -DWITH_DOXYGEN=ON && make -C _build apidoc
       paths:
-        - index.md
-        - manual
-        - man
+        - _build/docs/html
+        - docs/index.md
+        - docs/manual
+        - docs/man
