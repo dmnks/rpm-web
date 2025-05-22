@@ -9,6 +9,10 @@ defaults:
       overview: true
       snapshot: false
       draft: false
+  - scope:
+      path: "docs"
+    values:
+      layout: default
 
 collections:
   releases:

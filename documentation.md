@@ -7,9 +7,9 @@ This page attempts to track the various relevant documentation that exists for R
 
 ## General Use
 * RPM Reference Manual
-  * [git-master](doc/master/)
-  * [RPM 4.20.x](doc/4.20.x/)
-  * [RPM 4.19.x](doc/4.19.x/)
+  * [RPM 6.0.x](https://rpm-software-management.github.io/rpm/)
+  * [RPM 4.20.x](docs/4.20.x/)
+  * [RPM 4.19.x](docs/4.19.x/)
 * [RPM man pages](https://rpm-software-management.github.io/rpm/man/)
 * [Fedora News RPM Tutorial](http://fedoranews.org/alex/tutorial/rpm/)
 * [Fedora RPM Guide](https://web.archive.org/web/20170608211215/https://docs.fedoraproject.org/en-US/Fedora_Draft_Documentation/0.1/html/RPM_Guide/index.html)

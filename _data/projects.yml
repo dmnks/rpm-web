@@ -16,5 +16,26 @@
     baseurl: https://github.com/rpm-software-management/rpm/issues
     pattern: '\(#([0-9]+)\)'
   docs:
-    - path: docs/manual/*.md
-      type: guide
+    - series: 6.0.x
+      draft: true
+      make: true
+      root: _build/site
+      paths:
+        - index.md
+        - manual
+    - series: 4.20.x
+      draft: false
+      make: false
+      root: docs
+      paths:
+        - index.md
+        - manual
+        - man
+    - series: 4.19.x
+      draft: false
+      make: false
+      root: docs
+      paths:
+        - index.md
+        - manual
+        - man

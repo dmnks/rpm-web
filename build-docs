@@ -6,7 +6,7 @@ PROJECT=rpm
 REPO_URL=https://github.com/rpm-software-management/rpm
 REPO_DIR=_build/$PROJECT
 BARE_DIR=$REPO_DIR/bare
-DOCS_DIR=doc
+DEST_DIR=docs
 
 get_data() {
     yq -ot ".[] | select(.name == \"$PROJECT\")$1" _data/projects.yml | xargs
@@ -17,23 +17,29 @@ add_worktree() {
     git -C $BARE_DIR worktree add ../$1
 }
 
-merge_pages() {
-    local tree=$2
-    local dest=$DOCS_DIR/$3
-    local pages=$(get_data ".docs[] | select(.type == \"$1\").path")
+build() {
+    local tree=$REPO_DIR/$1
+    local dest=$DEST_DIR/$2
+
+    local base=".docs.[] | select(.series == \"$2\")"
+    local make=$(get_data "${base}.make")
+    local root=$(get_data "${base}.root")
+    local paths=$(get_data "${base}.paths")
+
+    add_worktree $1
     mkdir -p $dest
-    for page in $pages; do
-        cp $REPO_DIR/${tree}/${page} ${dest}/
+
+    if [ $make == true ]; then
+        cmake -B ${tree}/_build -S $tree
+        make -C ${tree}/_build pages
+    fi
+
+    for path in $paths; do
+        cp -r ${tree}/${root}/${path} ${dest}/
     done
 }
 
-build() {
-    add_worktree $1
-    merge_pages guide $1 $2
-}
-
 [ -d $BARE_DIR ] || git clone --bare $REPO_URL $BARE_DIR
-build master master
-for series in $(get_data .stable); do
+for series in $(get_data .docs.[].series); do
     build $PROJECT-$series $series
 done
