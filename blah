@@ -1,0 +1,8 @@
+#!/bin/bash
+
+DESTDIR=$1
+SCRIPT_DIR=$(dirname $(readlink -f $0))
+
+cd $SCRIPT_DIR
+cp -r _layouts _plugins $DESTDIR/
+rm $DESTDIR/_plugins/release.rb
