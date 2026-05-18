@@ -5,9 +5,9 @@ title: rpm.org - Roadmap
 
 # RPM Roadmap
 
-An overview of the project's direction and release plans, split into quarters.
-Both the dates and the content are tentative and subject to change. Everything
-above the horizontal line is completed and only kept for reference.
+An overview of the project's direction. Both the dates and the content are
+tentative and subject to change. Everything above the horizontal line is
+completed and only kept for reference.
 
 #### RPM 6.1 release (2026 Q2)
 * Improved keystore locking
@@ -22,27 +22,30 @@ above the horizontal line is completed and only kept for reference.
 
 ---
 
-#### RPM 6.2 release (2026 Q4)
-
+#### RPM 6.2 release (2026 Q3)
 * Persistent transaction journal (#2950)
-* Filesystem capability checks (#2637) & graceful abort (#3400)
-* Better file triggers usability (for systemd) (#4185)
-* BuildSystem rough edges & shortcomings (#3965)
-* Database parking (#2219)
+* Database parking (image reproducibility) (#2219)
+* More man pages (dependencies, spec format)
+
+#### RPM 6.3 release (2026 Q4)
+* Improved file triggers usability (systemd) (#4185)
 * OverlayFS-compatible database rebuilds (#2355)
-* New man pages (dependencies, spec format)
+* More man pages
 
-#### RPM 6.3 release (2027 Q2)
+#### RPM 6.4 release (2027 Q1)
+* Graceful handling of read-only mounts (#3400)
+* BuildSystem rough edges & shortcomings (#3965)
+* Complete man page suite (#3612)
 
+#### Mid-term plans (2027 Q2+)
+* Filesystem capability checks (#2637)
 * Durable transactions (journal based) (#2950)
-* Improved ordering & delayed scriptlet execution (#436)
+* Improved scriptlet ordering (#436)
 * File classifier based actions (#2207)
 * Arch-independent source archive format
 * Container-native database format (#2005)
-* Complete man page suite (#3612)
 
-#### Future releases (2027 Q4 and later)
-
+#### Long-term plans (2028+)
 * Scriptlet-free transactions
 * True multiarch support (#2197)
 * Better soname dependencies (#2872)
